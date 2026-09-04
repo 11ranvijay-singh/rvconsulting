@@ -1,0 +1,41 @@
+/* RV Consulting brand palette: navy, white, gold and light blue */
+:root {
+  --ink: #0F2A5F;
+  --cream: #FFFFFF;
+  --orange: #F4B400;
+  --mint: #EAF2FF;
+}
+
+body { background: #FFFFFF; }
+.site-header { border-color: #D9E5F7; }
+.hero-art { background: #EAF2FF; }
+.sun { background: #D8E8FF; }
+.arch { background: #0F2A5F; }
+.body { background: #173D7A; }
+.laptop { border-color: #D9E5F7; color: #F4B400; }
+.floating-card { box-shadow: 0 9px 22px rgba(15, 42, 95, .16); }
+.mini-icon, .course-info a span, .logo span { color: #F4B400; }
+.round-progress { border-color: #D7E6FC; border-right-color: #F4B400; }
+.plant i { background: #3469A7; }
+.trusted { background: #FFFFFF; border-color: #D9E5F7; }
+.programs { background: #EAF2FF; }
+.search-wrap { border-color: #C7D9F1; }
+.search-wrap button { background: #F4B400; color: #0F2A5F; }
+.image-design { background: #CFE1FF; color: #0F2A5F; }
+.image-business { background: #F9E4A5; color: #0F2A5F; }
+.image-tech { background: #9DBBEA; color: #FFFFFF; }
+.why { background: #0F2A5F; }
+.why-visual { background: #174281; }
+.blob-one { background: #F4B400; }
+.blob-two { border-color: #AFCDF7; }
+.why-copy .eyebrow, .why li span { color: #F4B400; }
+.why-copy .eyebrow i { background: #F4B400; }
+.stories { background: #FFFFFF; }
+.quote { color: #F4B400; }
+.dots .active { background: #F4B400; }
+.cta { background: #EAF2FF; }
+.button:hover { background: #F4B400; border-color: #F4B400; color: #0F2A5F; }
+.button-cream { background: #F4B400; border-color: #F4B400; color: #0F2A5F; }
+.text-button, .watch-button { color: #0F2A5F; text-decoration: none; }
+footer { background: #0F2A5F; }
+footer .logo, footer p, footer a { color: #FFFFFF; }

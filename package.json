@@ -1,0 +1,7 @@
+{
+  "name": "rv-consulting-site",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  }
+}
