@@ -59,6 +59,8 @@ h1, h2, h3, .section h2, .cta h2, .placement-heading h2, .enquiry-intro h2,
 .hero-banner small { font-weight: 400; line-height: 1.35; }
 .course-card, .fee-card, .video-feature, .social-link, .enquiry-form { border-radius: 8px; }
 .course-info h3, .fee-card h3, .video-content h3 { color: #0F2A5F; }
+.fee-card-featured h3 { color: #fff; }
+.fee-card-featured .duration, .fee-card-featured .price small { color: #D8E8FF; }
 .course-info > p { line-height: 1.55; }
 .benefits b, .social-link b, .founder-signoff b { font-weight: 700; }
 .button { font-weight: 700; border-radius: 4px; }
