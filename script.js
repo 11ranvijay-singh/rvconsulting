@@ -62,8 +62,9 @@ async function loadManagedContent() {
     if (!response.ok) return;
     const content = await response.json();
     const courseList = document.querySelector('.fee-grid');
-    if (courseList && content.courses?.length) {
-      courseList.innerHTML = content.courses.map((course) => `<article class="fee-card ${course.featured ? 'fee-card-featured' : ''}"><p class="fee-label">${course.featured ? 'MOST COMPREHENSIVE' : 'CAREER PROGRAMME'}</p><h3>${html(course.title)}</h3><p class="duration">${html(course.duration)}</p><div class="price"><s>${html(course.oldPrice)}</s><strong>${html(course.price)}</strong><small>${html(course.note)}</small></div><a class="button ${course.featured ? '' : 'button-outline'}" href="#enquiry">Enquire now <span>→</span></a></article>`).join('');
+    const visibleCourses = content.courses?.filter((course) => course.visible !== false) || [];
+    if (courseList && visibleCourses.length) {
+      courseList.innerHTML = visibleCourses.map((course) => `<article class="fee-card ${course.featured ? 'fee-card-featured' : ''}"><p class="fee-label">${course.featured ? 'MOST COMPREHENSIVE' : 'CAREER PROGRAMME'}</p><h3>${html(course.title)}</h3><p class="duration">${html(course.duration)}</p><div class="price"><s>${html(course.oldPrice)}</s><strong>${html(course.price)}</strong><small>${html(course.note)}</small></div><a class="button ${course.featured ? '' : 'button-outline'}" href="#enquiry">Enquire now <span>→</span></a></article>`).join('');
     }
     const visibleTestimonials = content.testimonials?.filter((item) => item.visible !== false) || [];
     const testimonial = document.querySelector('.testimonial');

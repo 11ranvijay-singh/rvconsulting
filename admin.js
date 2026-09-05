@@ -4,6 +4,12 @@ const escape = (value = '') => String(value).replace(/[&<>"]/g, (character) => (
 const field = (label, key, value, wide = false) => `<label class="${wide ? 'wide' : ''}">${label}<input data-key="${key}" value="${escape(value)}"></label>`;
 const render = () => {
   byId('courses').innerHTML = content.courses.map((course, index) => `<article data-index="${index}" data-type="courses"><div class="grid">${field('Course title', 'title', course.title, true)}${field('Duration', 'duration', course.duration)}${field('Current price', 'price', course.price)}${field('Previous price', 'oldPrice', course.oldPrice)}${field('Price note', 'note', course.note)}<label>Featured course<input data-key="featured" type="checkbox" ${course.featured ? 'checked' : ''}></label></div><button class="remove" type="button">Remove course</button></article>`).join('');
+  byId('courses').querySelectorAll('article').forEach((article, index) => {
+    const course = content.courses[index];
+    const visibility = document.createElement('label');
+    visibility.innerHTML = `Show on website<input data-key="visible" type="checkbox" ${course.visible !== false ? 'checked' : ''}>`;
+    article.querySelector('.grid').append(visibility);
+  });
   byId('testimonials').innerHTML = content.testimonials.map((item, index) => `<article data-index="${index}" data-type="testimonials"><div class="grid"><label class="wide">Testimonial<textarea data-key="quote">${escape(item.quote)}</textarea></label>${field('Name', 'name', item.name)}${field('Role', 'role', item.role)}<label>Show on website<input data-key="visible" type="checkbox" ${item.visible !== false ? 'checked' : ''}></label></div><button class="remove" type="button">Remove testimonial</button></article>`).join('');
   byId('testimonials').querySelectorAll('article').forEach((article, index) => {
     const item = content.testimonials[index];
@@ -24,7 +30,7 @@ document.addEventListener('change', (event) => {
   reader.readAsDataURL(file);
 });
 document.addEventListener('click', (event) => { const article = event.target.closest('article'); if (event.target.classList.contains('remove') && article) { content[article.dataset.type].splice(article.dataset.index, 1); render(); } });
-byId('add-course').onclick = () => { content.courses.push({ title: 'New course', duration: '', oldPrice: '', price: '', note: '', featured: false }); render(); };
+byId('add-course').onclick = () => { content.courses.push({ title: 'New course', duration: '', oldPrice: '', price: '', note: '', featured: false, visible: true }); render(); };
 byId('add-testimonial').onclick = () => { content.testimonials.push({ quote: '', name: '', role: '', visible: true }); render(); };
 byId('content-form').onsubmit = async (event) => { event.preventDefault(); const status = byId('status'); status.textContent = 'Saving…'; const response = await fetch('/api/content', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(content) }); status.textContent = response.ok ? 'Saved. Your website is updated.' : 'Unable to save changes.'; };
 fetch('/api/content').then((response) => response.json()).then((data) => { content = data; render(); }).catch(() => { byId('status').textContent = 'Unable to load content.'; });
