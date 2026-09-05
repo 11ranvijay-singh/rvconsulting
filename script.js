@@ -103,3 +103,8 @@ Object.entries(companyLogoMarks).forEach(([className, [brand, name]]) => {
   logo.onerror = () => logo.remove();
   company.prepend(logo);
 });
+
+const heroMomentumCard = document.querySelector('.card-bottom');
+if (heroMomentumCard) {
+  heroMomentumCard.innerHTML = '<span class="round-progress">LAB</span><div><b>Real case labs</b><small>Follow the money trail</small></div>';
+}
