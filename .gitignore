@@ -1,3 +1,12 @@
 tmp/
 dist/
 preview-server.js
+.idea/
+.github-cli/
+*.log
+output/
+site-package.tgz
+RV-Consulting-Netlify-Upload.zip
+RV-Consulting-Netlify-Upload/
+github-login.ps1
+local-preview.js

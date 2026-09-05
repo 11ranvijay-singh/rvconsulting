@@ -1,0 +1,49 @@
+{
+  "courses": [
+    {
+      "id": "aml-crypto",
+      "title": "AML / KYC / Fraud Investigation / Crypto",
+      "duration": "4-month programme",
+      "oldPrice": "INR 60,000",
+      "price": "INR 40,000",
+      "note": "Programme fee",
+      "featured": true
+    },
+    {
+      "id": "aml-fraud",
+      "title": "AML / KYC & Fraud Investigation",
+      "duration": "3-month programme",
+      "oldPrice": "INR 50,000",
+      "price": "INR 36,000",
+      "note": "Course fee",
+      "featured": false
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "rv-curriculum",
+      "quote": "Move from recognising risk to documenting and investigating it with a clear, structured approach.",
+      "name": "RV Consulting curriculum",
+      "role": "Financial Crime & Crypto Investigation",
+      "visible": true
+    },
+    {
+      "quote": "RV Consulting helped me gain practical skills and confidence for interviews. After completing the course, I was able to secure a job in my field.",
+      "name": "Priya Sharma",
+      "role": "Digital Marketing Student",
+      "visible": true
+    },
+    {
+      "quote": "The trainers explain every topic clearly and provide real project-based learning. The placement guidance was especially helpful.",
+      "name": "Rahul Verma",
+      "role": "Web Development Student",
+      "visible": true
+    },
+    {
+      "quote": "I joined the course with very little experience. The structured lessons, assignments, and career support helped me become job-ready.",
+      "name": "Neha Gupta",
+      "role": "Data Analytics Student",
+      "visible": true
+    }
+  ]
+}

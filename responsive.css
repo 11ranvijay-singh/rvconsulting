@@ -1,0 +1,102 @@
+/* Device-ready layout refinements: phone, tablet, iPad and desktop */
+html { -webkit-text-size-adjust: 100%; }
+img, iframe { max-width: 100%; }
+button, input, select, textarea { font: inherit; }
+
+.header-contact { display: grid; gap: 2px; line-height: 1.15; }
+.header-contact span { color: #737a85; font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
+.header-contact a { color: var(--ink); font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.managed-testimonial { margin-bottom: 46px; }
+.managed-testimonial:last-child { margin-bottom: 0; }
+
+@media (max-width: 1100px) {
+  .site-header { padding-inline: 5%; }
+  nav { margin-left: 22px; gap: 22px; }
+  .hero { padding-left: 7%; }
+  .section, .placement-section, .channel-section, .enquiry-section, .founder-section, .social-section { padding-inline: 7%; }
+  .hero-copy { padding-right: 25px; }
+  .course-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .company-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  body { overflow-x: hidden; }
+  .site-header { height: auto; min-height: 64px; padding: 10px 5%; gap: 10px; }
+  .logo-image { width: min(180px, 42vw); flex: 0 1 auto; }
+  .header-actions { margin-left: auto; }
+  .header-contact span { display: none; }
+  .header-contact a { font-size: 12px; }
+  .header-actions .button { min-height: 42px; padding: 10px 13px; gap: 8px; font-size: 12px; white-space: nowrap; }
+  .marketbar { padding: 10px 5%; }
+  .market-search { width: 100%; }
+  .market-search input { font-size: 16px; }
+  .market-categories { padding: 6px 0 4px; scrollbar-width: thin; }
+  .market-categories a { flex: 0 0 auto; padding: 5px 0; }
+  .hero { min-height: 0; }
+  .hero-copy { padding: 48px 6% 42px; }
+  .hero h1 { font-size: clamp(38px, 11vw, 54px); letter-spacing: -2px; }
+  .hero-text { font-size: 15px; }
+  .hero-actions { align-items: flex-start; flex-wrap: wrap; gap: 15px; }
+  .button { min-height: 44px; justify-content: center; }
+  .watch-button { min-height: 44px; }
+  .hero-banners { gap: 9px; }
+  .hero-banner { min-width: 0; flex-basis: 100%; }
+  .hero-art { min-height: 330px; }
+  .sun { width: 270px; height: 270px; }
+  .learner-row { margin-top: 35px; }
+  .trusted { padding-inline: 6%; overflow-x: auto; }
+  .trusted div { min-width: max-content; gap: 28px; }
+  .section, .placement-section, .channel-section, .enquiry-section, .founder-section, .social-section { padding: 58px 6%; }
+  .section h2, .why-copy h2, .cta h2, .placement-heading h2, .enquiry-intro h2, .founder-copy h2 { font-size: clamp(33px, 9vw, 42px); letter-spacing: -1.5px; }
+  .section-heading { margin-bottom: 26px; }
+  .section-heading .arrow-link { margin-top: 15px; }
+  .search-wrap { height: auto; min-height: 52px; padding-left: 14px; }
+  .search-wrap input { font-size: 16px; min-width: 0; }
+  .search-wrap button { min-height: 42px; padding-inline: 14px; }
+  .course-grid, .fee-grid, .benefits, .video-grid, .social-actions, .enquiry-form { grid-template-columns: minmax(0, 1fr); }
+  .course-card, .fee-card, .video-card, .social-link { min-width: 0; }
+  .course-image { height: 170px; }
+  .why { padding-top: 58px; padding-bottom: 58px; }
+  .why-visual { height: 290px; }
+  .visual-copy { font-size: 34px; left: 25px; bottom: 28px; }
+  .fee-card { min-height: 0; padding: 25px; }
+  .fee-card h3 { font-size: 24px; }
+  .benefits > div { padding: 16px; }
+  .deadline { margin-bottom: 34px; padding: 15px; }
+  .company-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .company-logo { min-height: 76px; padding: 8px; text-align: center; }
+  .company-logo b { font-size: 11px; overflow-wrap: anywhere; }
+  .placement-note { gap: 8px; }
+  .founder-portrait { width: min(235px, 70vw); height: min(235px, 70vw); }
+  .video-thumb, .video-thumb img { min-height: 0; aspect-ratio: 16 / 9; }
+  .video-content { padding: 27px 22px; }
+  .video-content h3 { font-size: 26px; }
+  .channel-player { padding: 7px; }
+  .enquiry-form { padding: 20px; gap: 14px; }
+  .enquiry-form input, .enquiry-form select, .enquiry-form textarea { min-height: 44px; font-size: 16px; }
+  .form-submit { width: 100%; }
+  .social-link { min-height: 70px; }
+  .cta { padding: 52px 6%; }
+  footer { padding: 25px 6%; align-items: flex-start; }
+  footer div { flex-wrap: wrap; row-gap: 11px; }
+}
+
+@media (max-width: 390px) {
+  .header-actions .button { font-size: 11px; padding-inline: 10px; }
+  .hero-copy { padding-inline: 5%; }
+  .section, .placement-section, .channel-section, .enquiry-section, .founder-section, .social-section { padding-inline: 5%; }
+  .hero-actions .button { width: 100%; }
+  .watch-button { width: 100%; }
+  .company-wall { grid-template-columns: 1fr; }
+  .deadline p { font-size: 11px; }
+}
+
+@media (min-width: 761px) and (max-width: 1024px) {
+  .site-header { padding-inline: 5%; }
+  .header-actions .button { padding-inline: 14px; }
+  .hero { grid-template-columns: 1fr .8fr; padding-left: 7%; }
+  .hero-copy { padding-top: 60px; }
+  .hero-art { min-height: 500px; }
+  .fee-card h3 { font-size: 23px; }
+  .enquiry-section { gap: 36px; }
+}
