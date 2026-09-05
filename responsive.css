@@ -6,6 +6,8 @@ button, input, select, textarea { font: inherit; }
 .header-contact { display: grid; gap: 2px; line-height: 1.15; }
 .header-contact span { color: #737a85; font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
 .header-contact a { color: var(--ink); font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.market-search > span, .search-wrap > span { display: inline-block; width: 16px; height: 16px; margin-right: 12px; border: 2px solid #0F2A5F; border-radius: 50%; font-size: 0 !important; line-height: 0; position: relative; transform: none !important; flex: 0 0 auto; }
+.market-search > span::after, .search-wrap > span::after { content: ''; position: absolute; width: 7px; height: 2px; background: #0F2A5F; right: -6px; bottom: -3px; transform: rotate(45deg); border-radius: 2px; }
 .managed-testimonial { margin-bottom: 46px; }
 .managed-testimonial:last-child { margin-bottom: 0; }
 
