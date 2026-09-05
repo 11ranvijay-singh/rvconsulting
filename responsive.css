@@ -8,6 +8,7 @@ button, input, select, textarea { font: inherit; }
 .header-contact a { color: var(--ink); font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
 .market-search > span, .search-wrap > span { display: inline-block; width: 16px; height: 16px; margin-right: 12px; border: 2px solid #0F2A5F; border-radius: 50%; font-size: 0 !important; line-height: 0; position: relative; transform: none !important; flex: 0 0 auto; }
 .market-search > span::after, .search-wrap > span::after { content: ''; position: absolute; width: 7px; height: 2px; background: #0F2A5F; right: -6px; bottom: -3px; transform: rotate(45deg); border-radius: 2px; }
+.market-search button, .search-wrap button { background: #0F2A5F !important; color: #fff !important; opacity: 1 !important; text-shadow: none; }
 .managed-testimonial { margin-bottom: 46px; }
 .managed-testimonial:last-child { margin-bottom: 0; }
 
