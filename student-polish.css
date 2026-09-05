@@ -53,8 +53,8 @@ h1, h2, h3, .section h2, .cta h2, .placement-heading h2, .enquiry-intro h2,
 }
 .company-logo:hover { background: #F7FAFF; transform: translateY(-2px); }
 
-.hero-banners { align-items: stretch; }
-.hero-banner { border-radius: 7px; min-height: 58px; }
+.hero-banners { align-items: stretch; flex-wrap: wrap; }
+.hero-banner { border-radius: 7px; min-height: 58px; flex: 1 1 190px; }
 .hero-banner b { font-size: 11px; font-weight: 700; }
 .hero-banner small { font-weight: 400; line-height: 1.35; }
 .course-card, .fee-card, .video-feature, .social-link, .enquiry-form { border-radius: 8px; }
