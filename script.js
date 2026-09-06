@@ -78,7 +78,7 @@ async function loadManagedContent() {
       demoSection.hidden = demoClass.visible === false;
       const rawMeetingLink = String(demoClass.meetingLink || '');
       const meetingLink = /^https?:\/\//i.test(rawMeetingLink) ? rawMeetingLink : 'https://wa.me/919717766543';
-      if (!demoSection.hidden) demoSection.innerHTML = `<div class="demo-calendar"><span>LIVE</span><b>DEMO</b><small>CLASS</small></div><div class="demo-class-copy"><p class="eyebrow"><i></i> FREE LIVE SESSION</p><h2>${html(demoClass.title || 'Live demo class')}</h2><p>${html(demoClass.description || '')}</p></div><div class="demo-class-schedule"><span>DATE</span><b>${html(demoClass.date || 'Date to be announced')}</b><span>TIME</span><b>${html(demoClass.time || 'Time to be announced')}</b></div><a class="button demo-class-button" href="${html(meetingLink)}" target="_blank" rel="noopener">${html(demoClass.buttonLabel || 'Get meeting link')} <span>→</span></a>`;
+      if (!demoSection.hidden) demoSection.innerHTML = `<div class="demo-calendar"><span>LIVE</span><b>DEMO</b><small>CLASS</small></div><div class="demo-class-copy"><p class="eyebrow"><i></i> FREE LIVE SESSION</p><h2>${html(demoClass.title || 'Live demo class')}</h2><p>${html(demoClass.description || '')}</p><p class="demo-contact-note">${html(demoClass.contactMessage || 'Contact us and we will give you full details on how to connect to your next demo class.')}</p></div><a class="button demo-class-button" href="${html(meetingLink)}" target="_blank" rel="noopener">${html(demoClass.buttonLabel || 'Contact us for demo details')} <span>→</span></a>`;
     }
     const visibleTestimonials = content.testimonials?.filter((item) => item.visible !== false) || [];
     const testimonial = document.querySelector('.testimonial');
