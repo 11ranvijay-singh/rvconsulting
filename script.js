@@ -80,7 +80,7 @@ async function loadManagedContent() {
       const meetingLink = /^https?:\/\//i.test(rawMeetingLink) ? rawMeetingLink : 'https://wa.me/919717766543';
       if (!demoSection.hidden) demoSection.innerHTML = `<div class="demo-calendar"><span>LIVE</span><b>DEMO</b><small>CLASS</small></div><div class="demo-class-copy"><p class="eyebrow"><i></i> FREE LIVE SESSION</p><h2>${html(demoClass.title || 'Live demo class')}</h2><p>${html(demoClass.description || '')}</p><p class="demo-contact-note">${html(demoClass.contactMessage || 'Contact us and we will give you full details on how to connect to your next demo class.')}</p></div><a class="button demo-class-button" href="${html(meetingLink)}" target="_blank" rel="noopener">${html(demoClass.buttonLabel || 'Contact us for demo details')} <span>→</span></a>`;
     }
-    const visibleTestimonials = content.testimonials?.filter((item) => item.visible !== false) || [];
+    const visibleTestimonials = (content.testimonials?.filter((item) => item.visible !== false) || []).slice(0, 3);
     const testimonial = document.querySelector('.testimonial');
     if (testimonial && visibleTestimonials.length) {
       testimonial.innerHTML = visibleTestimonials.map((item) => `<article class="managed-testimonial"><div class="quote">“</div><blockquote>${html(item.quote)}</blockquote><div class="student"><div class="student-photo">RV</div><p><b>${html(item.name)}</b><br>${html(item.role)}</p></div></article>`).join('');
@@ -94,6 +94,13 @@ async function loadManagedContent() {
         image.style.cssText = 'display:block;max-width:100%;max-height:260px;margin:0 auto 20px;border:1px solid #d6e2f3;border-radius:4px';
         card.prepend(image);
       });
+    }
+    const storiesSection = document.querySelector('#stories');
+    if (storiesSection && !storiesSection.querySelector('.testimonial-action')) {
+      const action = document.createElement('div');
+      action.className = 'testimonial-action';
+      action.innerHTML = '<a class="button" href="testimonials.html">View all learner stories <span>→</span></a>';
+      storiesSection.append(action);
     }
     const offerPreview = document.querySelector('.offer-letter-preview');
     const managedOfferLetters = content.offerLetters?.filter((item) => item.visible !== false && item.image) || [];
