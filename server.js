@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const root = __dirname;
 const database = path.join(root, 'data', 'content.json');
 const proofDirectory = path.join(root, 'assets', 'testimonial-proofs');
+const offerLetterDirectory = path.join(root, 'assets', 'offer-letter-uploads');
 const username = process.env.ADMIN_USERNAME || 'admin';
 const password = process.env.ADMIN_PASSWORD || 'ChangeMeNow123!';
 const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml' };
@@ -44,6 +45,19 @@ const saveProofImage = (testimonial) => {
   const { proofImageData, ...cleanTestimonial } = testimonial;
   return { ...cleanTestimonial, proofImage: `assets/testimonial-proofs/${filename}` };
 };
+const saveOfferLetterImage = (offerLetter) => {
+  if (!offerLetter.imageData?.startsWith('data:image/')) return offerLetter;
+  const match = offerLetter.imageData.match(/^data:image\/(png|jpeg|webp);base64,(.+)$/);
+  if (!match) throw new Error('Offer letter must be a PNG, JPG, or WebP image.');
+  const image = Buffer.from(match[2], 'base64');
+  if (!image.length || image.length > 5 * 1024 * 1024) throw new Error('Offer letter image must be smaller than 5 MB.');
+  const extension = match[1] === 'jpeg' ? 'jpg' : match[1];
+  fs.mkdirSync(offerLetterDirectory, { recursive: true });
+  const filename = `${crypto.randomUUID()}.${extension}`;
+  fs.writeFileSync(path.join(offerLetterDirectory, filename), image);
+  const { imageData, ...cleanOfferLetter } = offerLetter;
+  return { ...cleanOfferLetter, image: `assets/offer-letter-uploads/${filename}` };
+};
 
 http.createServer(async (request, response) => {
   const url = new URL(request.url, 'http://localhost');
@@ -54,7 +68,9 @@ http.createServer(async (request, response) => {
     try {
       const content = await readBody(request);
       if (!Array.isArray(content.courses) || !Array.isArray(content.testimonials)) return sendJson(response, 400, { error: 'Courses and testimonials are required.' });
+      if (!Array.isArray(content.offerLetters)) content.offerLetters = [];
       content.testimonials = content.testimonials.map(saveProofImage);
+      content.offerLetters = content.offerLetters.map(saveOfferLetterImage);
       writeContent(content);
       return sendJson(response, 200, content);
     } catch (error) { return sendJson(response, 400, { error: error.message }); }

@@ -81,6 +81,13 @@ async function loadManagedContent() {
         card.prepend(image);
       });
     }
+    const offerPreview = document.querySelector('.offer-letter-preview');
+    const managedOfferLetters = content.offerLetters?.filter((item) => item.visible !== false && item.image) || [];
+    if (offerPreview && managedOfferLetters.length) {
+      const staticOfferLetters = Array.from({ length: 94 }, (_, index) => `assets/offer-letters/offer-letter-${String(index + 1).padStart(3, '0')}.jpeg`);
+      const allOfferLetters = [...managedOfferLetters.map((item) => item.image), ...staticOfferLetters].slice(0, 6);
+      offerPreview.innerHTML = allOfferLetters.map((image, index) => `<a href="${html(image)}" target="_blank" rel="noopener"><img src="${html(image)}" alt="Learner offer letter proof ${index + 1}" loading="lazy"><span>View offer letter</span></a>`).join('');
+    }
   } catch (_) { /* The static preview remains usable when the admin API is unavailable. */ }
 }
 loadManagedContent();
