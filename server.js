@@ -69,6 +69,7 @@ http.createServer(async (request, response) => {
       const content = await readBody(request);
       if (!Array.isArray(content.courses) || !Array.isArray(content.testimonials)) return sendJson(response, 400, { error: 'Courses and testimonials are required.' });
       if (!Array.isArray(content.offerLetters)) content.offerLetters = [];
+      if (!Array.isArray(content.studyMaterials)) content.studyMaterials = [];
       content.testimonials = content.testimonials.map(saveProofImage);
       content.offerLetters = content.offerLetters.map(saveOfferLetterImage);
       writeContent(content);

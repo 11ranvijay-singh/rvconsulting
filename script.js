@@ -66,6 +66,12 @@ async function loadManagedContent() {
     if (courseList && visibleCourses.length) {
       courseList.innerHTML = visibleCourses.map((course) => `<article class="fee-card ${course.featured ? 'fee-card-featured' : ''}"><p class="fee-label">${course.featured ? 'MOST COMPREHENSIVE' : 'CAREER PROGRAMME'}</p><h3>${html(course.title)}</h3><p class="duration">${html(course.duration)}</p><div class="price"><s>${html(course.oldPrice)}</s><strong>${html(course.price)}</strong><small>${html(course.note)}</small></div><a class="button ${course.featured ? '' : 'button-outline'}" href="#enquiry">Enquire now <span>→</span></a></article>`).join('');
     }
+    const studyMaterial = content.studyMaterials?.find((item) => item.visible !== false);
+    const studySection = document.querySelector('.study-material-section');
+    if (studySection && studyMaterial) {
+      const requestMessage = encodeURIComponent(studyMaterial.whatsappMessage || `Hi RV Consulting, I want to get access to the ${studyMaterial.title} notes.`);
+      studySection.innerHTML = `<div class="study-material-book" aria-hidden="true"><span>RV</span><small>${html(studyMaterial.institution || 'RV Consulting Institute')}</small><b>${html(studyMaterial.title)}</b><em>${html(studyMaterial.edition)}</em><i>${html(studyMaterial.subtitle)}</i></div><div class="study-material-copy"><p class="eyebrow"><i></i> STUDY MATERIAL</p><h2>${html(studyMaterial.title)}</h2><p>${html(studyMaterial.description)}</p><ul><li><span>01</span>${html(studyMaterial.edition)}</li><li><span>02</span>${html(studyMaterial.subtitle)}</li><li><span>03</span>Professional AML/KYC study reference</li></ul><div class="study-material-price"><span><s>${html(studyMaterial.oldPrice)}</s> Original price</span><strong>${html(studyMaterial.price)}</strong><small>${html(studyMaterial.note || 'Study-material access')}</small></div><a class="button" href="https://wa.me/919717766543?text=${requestMessage}" target="_blank" rel="noopener">Request notes on WhatsApp <span>→</span></a><p class="study-material-note">Send us a WhatsApp message and our team will guide you on getting access.</p></div>`;
+    }
     const visibleTestimonials = content.testimonials?.filter((item) => item.visible !== false) || [];
     const testimonial = document.querySelector('.testimonial');
     if (testimonial && visibleTestimonials.length) {

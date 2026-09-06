@@ -20,6 +20,20 @@
     }
   ],
   "offerLetters": [],
+  "studyMaterials": [
+    {
+      "title": "ACAMS Study Handbook",
+      "institution": "RV Consulting Institute",
+      "edition": "Handbook Edition: 2023–2026",
+      "subtitle": "Certified Anti-Money Laundering Specialist (CAMS)",
+      "description": "A clean, professionally organised study guide designed for AML/KYC learners.",
+      "oldPrice": "₹15,000",
+      "price": "₹9,999",
+      "note": "Study-material access",
+      "whatsappMessage": "Hi RV Consulting, I want to get access to the ACAMS Study Handbook notes for ₹9,999.",
+      "visible": true
+    }
+  ],
   "testimonials": [
     {
       "id": "rv-curriculum",
