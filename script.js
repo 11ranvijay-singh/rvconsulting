@@ -72,6 +72,14 @@ async function loadManagedContent() {
       const requestMessage = encodeURIComponent(studyMaterial.whatsappMessage || `Hi RV Consulting, I want to get access to the ${studyMaterial.title} notes.`);
       studySection.innerHTML = `<div class="study-material-book" aria-hidden="true"><span>RV</span><small>${html(studyMaterial.institution || 'RV Consulting Institute')}</small><b>${html(studyMaterial.title)}</b><em>${html(studyMaterial.edition)}</em><i>${html(studyMaterial.subtitle)}</i></div><div class="study-material-copy"><p class="eyebrow"><i></i> STUDY MATERIAL</p><h2>${html(studyMaterial.title)}</h2><p>${html(studyMaterial.description)}</p><ul><li><span>01</span>${html(studyMaterial.edition)}</li><li><span>02</span>${html(studyMaterial.subtitle)}</li><li><span>03</span>Professional AML/KYC study reference</li></ul><div class="study-material-price"><span><s>${html(studyMaterial.oldPrice)}</s> Original price</span><strong>${html(studyMaterial.price)}</strong><small>${html(studyMaterial.note || 'Study-material access')}</small></div><a class="button" href="https://wa.me/919717766543?text=${requestMessage}" target="_blank" rel="noopener">Request notes on WhatsApp <span>→</span></a><p class="study-material-note">Send us a WhatsApp message and our team will guide you on getting access.</p></div>`;
     }
+    const demoSection = document.querySelector('.demo-class-section');
+    const demoClass = content.demoClass;
+    if (demoSection && demoClass) {
+      demoSection.hidden = demoClass.visible === false;
+      const rawMeetingLink = String(demoClass.meetingLink || '');
+      const meetingLink = /^https?:\/\//i.test(rawMeetingLink) ? rawMeetingLink : 'https://wa.me/919717766543';
+      if (!demoSection.hidden) demoSection.innerHTML = `<div class="demo-calendar"><span>LIVE</span><b>DEMO</b><small>CLASS</small></div><div class="demo-class-copy"><p class="eyebrow"><i></i> FREE LIVE SESSION</p><h2>${html(demoClass.title || 'Live demo class')}</h2><p>${html(demoClass.description || '')}</p></div><div class="demo-class-schedule"><span>DATE</span><b>${html(demoClass.date || 'Date to be announced')}</b><span>TIME</span><b>${html(demoClass.time || 'Time to be announced')}</b></div><a class="button demo-class-button" href="${html(meetingLink)}" target="_blank" rel="noopener">${html(demoClass.buttonLabel || 'Get meeting link')} <span>→</span></a>`;
+    }
     const visibleTestimonials = content.testimonials?.filter((item) => item.visible !== false) || [];
     const testimonial = document.querySelector('.testimonial');
     if (testimonial && visibleTestimonials.length) {

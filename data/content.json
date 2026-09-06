@@ -34,6 +34,15 @@
       "visible": true
     }
   ],
+  "demoClass": {
+    "title": "Live demo class",
+    "description": "See how our practical financial-crime training works before you enrol.",
+    "date": "Date to be announced",
+    "time": "Time to be announced",
+    "meetingLink": "https://wa.me/919717766543?text=Hi%20RV%20Consulting%2C%20I%20want%20the%20meeting%20link%20for%20the%20live%20demo%20class.",
+    "buttonLabel": "Get meeting link",
+    "visible": true
+  },
   "testimonials": [
     {
       "id": "rv-curriculum",
