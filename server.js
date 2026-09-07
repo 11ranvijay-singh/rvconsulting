@@ -7,9 +7,10 @@ const root = __dirname;
 const database = path.join(root, 'data', 'content.json');
 const proofDirectory = path.join(root, 'assets', 'testimonial-proofs');
 const offerLetterDirectory = path.join(root, 'assets', 'offer-letter-uploads');
+const maxAdminRequestBytes = 8 * 1024 * 1024;
 const username = process.env.ADMIN_USERNAME || 'admin';
 const password = process.env.ADMIN_PASSWORD || 'ChangeMeNow123!';
-const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
 
 const sendJson = (response, status, body) => {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -28,9 +29,12 @@ const requireAdmin = (request, response) => {
   return false;
 };
 const readBody = (request) => new Promise((resolve, reject) => {
-  let body = '';
-  request.on('data', (chunk) => { body += chunk; if (body.length > 100000) request.destroy(); });
-  request.on('end', () => { try { resolve(JSON.parse(body || '{}')); } catch { reject(new Error('Invalid JSON')); } });
+  let body = ''; let size = 0;
+  request.on('data', (chunk) => { size += chunk.length; if (size <= maxAdminRequestBytes) body += chunk; });
+  request.on('end', () => {
+    if (size > maxAdminRequestBytes) return reject(new Error('Upload is too large. Choose an image smaller than 5 MB.'));
+    try { resolve(JSON.parse(body || '{}')); } catch { reject(new Error('Invalid request data. Please try again.')); }
+  });
 });
 const saveProofImage = (testimonial) => {
   if (!testimonial.proofImageData?.startsWith('data:image/')) return testimonial;
