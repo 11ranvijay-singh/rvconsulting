@@ -76,7 +76,28 @@ const openCourseModal = (title, detail) => {
   modal.hidden = false;
   modal.querySelector('.course-modal-close').focus();
 };
+const openApproachModal = () => {
+  let modal = document.querySelector('#course-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'course-modal';
+    modal.className = 'course-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.append(modal);
+  }
+  const message = encodeURIComponent('Hi RV Consulting, I would like to understand your training approach better. Please guide me one-to-one.');
+  modal.innerHTML = `<div class="course-modal-dialog"><button class="course-modal-close" type="button" aria-label="Close our approach details">×</button><span class="course-modal-kicker">OUR APPROACH</span><h2>Learn by doing.</h2><p class="course-modal-description">Our training is designed around the way financial-crime work is done in practice: understand the risk, review the evidence and document a clear conclusion.</p><ul class="course-modal-points"><li>Practical AML, KYC, fraud and crypto scenarios</li><li>Step-by-step guidance for reviewing risk signals</li><li>Clear notes, escalation and report-writing practice</li><li>One-to-one support for course and career questions</li></ul><div class="course-modal-actions"><a class="button" href="https://wa.me/919717766543?text=${message}" target="_blank" rel="noopener">WhatsApp us <span>→</span></a><a class="button" href="tel:+919717766543">Call us <span>→</span></a></div></div>`;
+  modal.hidden = false;
+  modal.querySelector('.course-modal-close').focus();
+};
 document.addEventListener('click', (event) => {
+  const approachLink = event.target.closest('.why-copy .button-light');
+  if (approachLink) {
+    event.preventDefault();
+    openApproachModal();
+    return;
+  }
   const exploreLink = event.target.closest('.course-card .course-info a');
   if (exploreLink) {
     event.preventDefault();
@@ -170,3 +191,22 @@ const heroMomentumCard = document.querySelector('.card-bottom');
 if (heroMomentumCard) {
   heroMomentumCard.innerHTML = '<span class="round-progress">LAB</span><div><b>Real case labs</b><small>Follow the money trail</small></div>';
 }
+
+const welcomePopupKey = 'rv-welcome-popup-dismissed';
+const showWelcomePopup = () => {
+  if (sessionStorage.getItem(welcomePopupKey)) return;
+  const popup = document.createElement('div');
+  popup.className = 'welcome-popup';
+  popup.id = 'welcome-popup';
+  popup.setAttribute('role', 'dialog');
+  popup.setAttribute('aria-modal', 'true');
+  popup.setAttribute('aria-label', 'Upcoming batch enrolment');
+  popup.innerHTML = `<div class="welcome-popup-card"><div class="welcome-popup-top">LIMITED SEATS FOR THE UPCOMING BATCH</div><button class="welcome-popup-close" type="button" aria-label="Close enrolment notice">×</button><div class="welcome-popup-content"><h2>Only a few seats<br>left to <em>enrol.</em></h2><p>Join RV Consulting's latest upcoming batch for practical AML, KYC, fraud and crypto investigation training.</p><p class="welcome-goal">Make a focused choice today and achieve your career goals with better guidance.</p><div class="welcome-popup-actions"><a class="button" href="https://wa.me/919717766543?text=Hi%20RV%20Consulting%2C%20I%20want%20to%20enrol%20for%20the%20upcoming%20batch." target="_blank" rel="noopener">Enrol on WhatsApp <span>→</span></a><a class="button welcome-call" href="tel:+919717766543">Call us <span>→</span></a></div><a class="welcome-explore" href="#enrolment">Explore programme details →</a></div></div>`;
+  document.body.append(popup);
+  const dismiss = () => { sessionStorage.setItem(welcomePopupKey, 'true'); popup.remove(); };
+  popup.querySelector('.welcome-popup-close').addEventListener('click', dismiss);
+  popup.querySelector('.welcome-explore').addEventListener('click', dismiss);
+  popup.addEventListener('click', (event) => { if (event.target === popup) dismiss(); });
+  popup.querySelector('.welcome-popup-close').focus();
+};
+window.setTimeout(showWelcomePopup, 450);
