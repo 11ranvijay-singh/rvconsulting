@@ -56,6 +56,40 @@ document.querySelectorAll('.fee-card .price small').forEach((note, index) => {
 });
 
 const html = (value = '') => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character]);
+const courseModalContent = {
+  aml: { description: 'Build a practical foundation for reviewing customer risk and identifying financial-crime red flags.', points: ['Customer due diligence and enhanced due diligence', 'Sanctions, PEP and adverse-media screening', 'Risk profiling and transaction-monitoring basics'] },
+  fraud: { description: 'Learn a structured approach to detecting, documenting and escalating fraud-related concerns.', points: ['Payment, identity and account-takeover risk signals', 'Evidence review and case investigation workflow', 'Clear investigation notes and escalation summaries'] },
+  crypto: { description: 'Understand how to assess wallet activity and follow transaction trails in crypto-related reviews.', points: ['Blockchain, wallet and transaction fundamentals', 'Crypto AML risk indicators and tracing concepts', 'Practical review approach for suspicious activity'] }
+};
+const openCourseModal = (title, detail) => {
+  let modal = document.querySelector('#course-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'course-modal';
+    modal.className = 'course-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.append(modal);
+  }
+  const message = encodeURIComponent(`Hi RV Consulting, I would like one-to-one guidance for ${title}. Please guide me.`);
+  modal.innerHTML = `<div class="course-modal-dialog"><button class="course-modal-close" type="button" aria-label="Close course details">×</button><span class="course-modal-kicker">MODULE OVERVIEW</span><h2>${html(title)}</h2><p class="course-modal-description">${html(detail.description)}</p><ul class="course-modal-points">${detail.points.map((point) => `<li>${html(point)}</li>`).join('')}</ul><a class="button" href="https://wa.me/919717766543?text=${message}" target="_blank" rel="noopener">Contact us for one-to-one guidance <span>→</span></a></div>`;
+  modal.hidden = false;
+  modal.querySelector('.course-modal-close').focus();
+};
+document.addEventListener('click', (event) => {
+  const exploreLink = event.target.closest('.course-card .course-info a');
+  if (exploreLink) {
+    event.preventDefault();
+    const card = exploreLink.closest('.course-card');
+    const topic = card?.dataset.course || '';
+    const detail = topic.includes('crypto') ? courseModalContent.crypto : topic.includes('fraud') ? courseModalContent.fraud : courseModalContent.aml;
+    openCourseModal(card?.querySelector('h3')?.textContent.trim() || 'Course module', detail);
+  }
+  const modal = document.querySelector('#course-modal');
+  if (modal && (event.target === modal || event.target.closest('.course-modal-close'))) modal.hidden = true;
+});
+document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { const modal = document.querySelector('#course-modal'); if (modal) modal.hidden = true; } });
+
 async function loadManagedContent() {
   try {
     const response = await fetch('/api/content');
