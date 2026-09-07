@@ -105,7 +105,7 @@ async function loadManagedContent() {
     const offerPreview = document.querySelector('.offer-letter-preview');
     const managedOfferLetters = content.offerLetters?.filter((item) => item.visible !== false && item.image) || [];
     if (offerPreview && managedOfferLetters.length) {
-      const staticOfferLetters = Array.from({ length: 92 }, (_, index) => `assets/offer-letters/offer-letter-${String(index + 1).padStart(3, '0')}.jpeg`);
+      const staticOfferLetters = Array.from({ length: 91 }, (_, index) => `assets/offer-letters/offer-letter-${String(index + 1).padStart(3, '0')}.jpeg`);
       const allOfferLetters = [...managedOfferLetters.map((item) => item.image), ...staticOfferLetters].slice(0, 6);
       offerPreview.innerHTML = allOfferLetters.map((image, index) => `<a href="${html(image)}" target="_blank" rel="noopener"><img src="${html(image)}" alt="Learner offer letter proof ${index + 1}" loading="lazy"><span>View offer letter</span></a>`).join('');
     }
