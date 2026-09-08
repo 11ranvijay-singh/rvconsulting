@@ -2,6 +2,10 @@ const input = document.querySelector('#course-search');
 const button = document.querySelector('#search-button');
 const cards = [...document.querySelectorAll('.course-card')];
 const empty = document.querySelector('#no-results');
+const pageLoader = document.querySelector('#page-loader');
+const dismissLoader = () => pageLoader?.classList.add('is-hidden');
+window.addEventListener('load', () => window.setTimeout(dismissLoader, 180));
+window.setTimeout(dismissLoader, 3500);
 function filterCourses() {
   const term = input.value.trim().toLowerCase();
   let count = 0;
@@ -166,7 +170,13 @@ async function loadManagedContent() {
     }
   } catch (_) { /* The static preview remains usable when the admin API is unavailable. */ }
 }
-loadManagedContent();
+loadManagedContent().finally(dismissLoader);
+
+const backToTop = document.querySelector('#back-to-top');
+const toggleBackToTop = () => backToTop?.classList.toggle('is-visible', window.scrollY > 420);
+window.addEventListener('scroll', toggleBackToTop, { passive: true });
+toggleBackToTop();
+backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
 const companyLogoMarks = {
   amex: ['americanexpress', 'American Express'], barclays: ['barclays', 'Barclays'],
