@@ -228,7 +228,7 @@ window.setTimeout(() => {
   }
   const faqList = document.querySelector('#faq .faq-list');
   if (faqList && !faqList.querySelector('[data-policy-question]')) {
-    faqList.insertAdjacentHTML('beforeend', `<details data-policy-question><summary>What are the payment and refund terms?</summary><p>All course, study-material and related-service fees are non-refundable once paid. Please review the Cancellation &amp; Refund Policy and confirm your course and payment arrangement with RV Consulting before making payment.</p></details><details data-policy-question><summary>How is my enquiry information used?</summary><p>Your enquiry details are used to respond to your course request and provide relevant guidance. Do not share sensitive information through public forms or chats.</p></details><details data-policy-question><summary>Does career support guarantee a job?</summary><p>Career support is guidance for preparation and job-relevant skills. It does not guarantee employment, an interview or an offer.</p></details>`);
+    faqList.insertAdjacentHTML('beforeend', `<details data-policy-question><summary>What are the payment and refund terms?</summary><p>We encourage you to choose your programme with full clarity, and our team is happy to guide you before payment. Once a payment is made, course, study-material and related-service fees are non-refundable. Please review the Cancellation &amp; Refund Policy and confirm your course and payment arrangement with RV Consulting before enrolling.</p></details><details data-policy-question><summary>How is my enquiry information used?</summary><p>Your enquiry details are used to respond to your course request and provide relevant guidance. Do not share sensitive information through public forms or chats.</p></details><details data-policy-question><summary>Does career support guarantee a job?</summary><p>Career support is guidance for preparation and job-relevant skills. It does not guarantee employment, an interview or an offer.</p></details>`);
   }
 }, 0);
 
@@ -256,4 +256,32 @@ window.setTimeout(() => {
   if (faqList && !faqList.querySelector('[data-instalment-question]')) {
     faqList.insertAdjacentHTML('beforeend', `<details data-instalment-question><summary>Can I pay my course fee in instalments?</summary><p>Yes. You can divide the total course fee equally across the course duration. For example, for a 4-month course priced at ₹40,000, you can pay ₹10,000 per month. The monthly instalment is calculated by dividing the total course fee by the number of course months. Contact RV Consulting to confirm the instalment schedule for your selected course.</p></details>`);
   }
+}, 0);
+
+window.setTimeout(() => {
+  const faqSection = document.querySelector('#faq');
+  const faqList = faqSection?.querySelector('.faq-list');
+  const allFaqs = faqList ? Array.from(faqList.querySelectorAll('details')) : [];
+  if (!faqSection || allFaqs.length <= 4 || document.querySelector('#faq-modal')) return;
+  const remainingFaqs = allFaqs.slice(4).map((item) => item.outerHTML).join('');
+  allFaqs.slice(4).forEach((item) => item.remove());
+  const action = document.createElement('div');
+  action.className = 'faq-view-all';
+  action.innerHTML = '<button class="button" type="button" id="faq-view-all">View all FAQs <span>→</span></button>';
+  faqList.insertAdjacentElement('afterend', action);
+  const modal = document.createElement('div');
+  modal.className = 'faq-modal';
+  modal.id = 'faq-modal';
+  modal.hidden = true;
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'faq-modal-title');
+  modal.innerHTML = `<div class="faq-modal-card"><button class="faq-modal-close" type="button" aria-label="Close all FAQs">×</button><h2 id="faq-modal-title">More answers</h2><p>Everything you may want to know before starting your learning journey.</p><div class="faq-list">${remainingFaqs}</div></div>`;
+  document.body.append(modal);
+  const showFaqModal = () => { modal.hidden = false; modal.querySelector('.faq-modal-close')?.focus(); };
+  const hideFaqModal = () => { modal.hidden = true; action.querySelector('button')?.focus(); };
+  action.querySelector('button')?.addEventListener('click', showFaqModal);
+  modal.querySelector('.faq-modal-close')?.addEventListener('click', hideFaqModal);
+  modal.addEventListener('click', (event) => { if (event.target === modal) hideFaqModal(); });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.hidden) hideFaqModal(); });
 }, 0);
