@@ -10,7 +10,7 @@ const offerLetterDirectory = path.join(root, 'assets', 'offer-letter-uploads');
 const maxAdminRequestBytes = 8 * 1024 * 1024;
 const username = process.env.ADMIN_USERNAME || 'admin';
 const password = process.env.ADMIN_PASSWORD || 'ChangeMeNow123!';
-const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
+const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8', '.webp': 'image/webp', '.xml': 'application/xml; charset=utf-8' };
 
 const sendJson = (response, status, body) => {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
