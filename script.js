@@ -178,25 +178,6 @@ window.addEventListener('scroll', toggleBackToTop, { passive: true });
 toggleBackToTop();
 backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-const companyLogoMarks = {
-  amex: ['americanexpress', 'American Express'], barclays: ['barclays', 'Barclays'],
-  exl: ['exl', 'EXL'], optum: ['optum', 'Optum'], revolut: ['revolut', 'Revolut'],
-  genpact: ['genpact', 'Genpact'], accenture: ['accenture', 'Accenture'],
-  bt: ['bt', 'BT'], wipro: ['wipro', 'Wipro'], hcl: ['hcl', 'HCLTech'],
-};
-Object.entries(companyLogoMarks).forEach(([className, [brand, name]]) => {
-  const company = document.querySelector(`.company-logo.${className}`);
-  if (!company) return;
-  company.querySelector('i')?.remove();
-  const logo = document.createElement('img');
-  logo.src = `https://cdn.simpleicons.org/${brand}`;
-  logo.alt = `${name} logo`;
-  logo.loading = 'lazy';
-  logo.style.cssText = 'width:42px;height:42px;object-fit:contain;flex:0 0 auto';
-  logo.onerror = () => logo.remove();
-  company.prepend(logo);
-});
-
 const heroMomentumCard = document.querySelector('.card-bottom');
 if (heroMomentumCard) {
   heroMomentumCard.innerHTML = '<span class="round-progress">LAB</span><div><b>Real case labs</b><small>Follow the money trail</small></div>';
