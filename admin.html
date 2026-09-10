@@ -1,17 +1,17 @@
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><title>RV Consulting Admin</title><link rel="stylesheet" href="admin.css"></head>
-<body><main>
-  <a href="/">← View website</a><h1>Content manager</h1>
-  <p>Edit courses, prices, FAQs, testimonials, study materials, demo-class details and offer-letter proofs. Click Save when you are done.</p>
-  <form id="content-form">
-    <section><div class="section-title"><h2>Courses</h2><button type="button" id="add-course">Add course</button></div><div id="courses"></div></section>
-    <section><div class="section-title"><h2>Testimonials</h2><button type="button" id="add-testimonial">Add testimonial</button></div><div id="testimonials"></div></section>
-    <section><div class="section-title"><h2>Frequently asked questions</h2><button type="button" id="add-faq">Add FAQ</button></div><p class="section-note">The first four visible FAQs appear on the homepage. Remaining visible FAQs appear under “View all FAQs”.</p><div id="faqs"></div></section>
-    <section><div class="section-title"><h2>Study materials</h2><button type="button" id="add-study-material">Add study material</button></div><p class="section-note">Edit the handbook offer, price and WhatsApp request message shown on the front end.</p><div id="study-materials"></div></section>
-    <section><div class="section-title"><h2>Demo class</h2></div><p class="section-note">Set the title, description, contact message and WhatsApp/meeting link for your next demo class.</p><div id="demo-class"></div></section>
-    <section><div class="section-title"><h2>Offer letters</h2><button type="button" id="add-offer-letter">Add offer letter</button></div><p class="section-note">Upload an image only. It will show on the front-end offer-letter gallery after saving.</p><div id="offer-letters"></div></section>
-    <button class="save" type="submit">Save all changes</button><p id="status" role="status"></p>
-  </form>
-</main><script src="admin.js"></script></body>
+<body><div class="admin-shell">
+  <aside class="sidebar"><a class="admin-brand" href="/"><img src="assets/rv-consulting-logo-realistic.png" alt="RV Consulting"><span>ADMIN PANEL</span></a><nav aria-label="Content sections"><button class="menu-link active" type="button" data-panel-target="courses">Courses</button><button class="menu-link" type="button" data-panel-target="faqs">FAQs</button><button class="menu-link" type="button" data-panel-target="testimonials">Testimonials</button><button class="menu-link" type="button" data-panel-target="study-materials">Study material</button><button class="menu-link" type="button" data-panel-target="demo-class">Demo class</button><button class="menu-link" type="button" data-panel-target="offer-letters">Offer letters</button></nav><a class="view-site" href="/">View website &rarr;</a></aside>
+  <main class="admin-main"><header class="admin-header"><p class="eyebrow">RV CONSULTING</p><h1>Content manager</h1><p>Choose a section from the menu. Save only the section you are working on.</p></header><p id="status" role="status" aria-live="polite"></p>
+    <form id="content-form">
+      <section class="admin-panel" data-panel="courses"><div class="panel-heading"><div><h2>Courses</h2><p>Edit course duration, price and visibility.</p></div><button type="button" class="secondary-action" id="add-course">Add course</button></div><div id="courses"></div><div class="panel-save"><button class="save" type="button" data-save-section="courses">Save courses</button></div></section>
+      <section class="admin-panel" data-panel="faqs" hidden><div class="panel-heading"><div><h2>Frequently asked questions</h2><p>The first four visible FAQs appear on the homepage. The rest appear in “View all FAQs”.</p></div><button type="button" class="secondary-action" id="add-faq">Add FAQ</button></div><div id="faqs"></div><div class="panel-save"><button class="save" type="button" data-save-section="faqs">Save FAQs</button></div></section>
+      <section class="admin-panel" data-panel="testimonials" hidden><div class="panel-heading"><div><h2>Testimonials</h2><p>Add learner feedback and optional proof images.</p></div><button type="button" class="secondary-action" id="add-testimonial">Add testimonial</button></div><div id="testimonials"></div><div class="panel-save"><button class="save" type="button" data-save-section="testimonials">Save testimonials</button></div></section>
+      <section class="admin-panel" data-panel="study-materials" hidden><div class="panel-heading"><div><h2>Study material</h2><p>Edit handbook details, pricing and the WhatsApp request message.</p></div><button type="button" class="secondary-action" id="add-study-material">Add material</button></div><div id="study-materials"></div><div class="panel-save"><button class="save" type="button" data-save-section="study-materials">Save study material</button></div></section>
+      <section class="admin-panel" data-panel="demo-class" hidden><div class="panel-heading"><div><h2>Demo class</h2><p>Set your current demo-class details and contact link.</p></div></div><div id="demo-class"></div><div class="panel-save"><button class="save" type="button" data-save-section="demo-class">Save demo class</button></div></section>
+      <section class="admin-panel" data-panel="offer-letters" hidden><div class="panel-heading"><div><h2>Offer letters</h2><p>Upload image-only offer-letter proofs for the website gallery.</p></div><button type="button" class="secondary-action" id="add-offer-letter">Add offer letter</button></div><div id="offer-letters"></div><div class="panel-save"><button class="save" type="button" data-save-section="offer-letters">Save offer letters</button></div></section>
+    </form>
+  </main>
+</div><script src="admin.js"></script></body>
 </html>
