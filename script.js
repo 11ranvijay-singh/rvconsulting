@@ -115,11 +115,41 @@ document.addEventListener('click', (event) => {
 });
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { const modal = document.querySelector('#course-modal'); if (modal) modal.hidden = true; } });
 
+function renderManagedFaqs(faqs) {
+  const faqSection = document.querySelector('#faq');
+  const faqList = faqSection?.querySelector('.faq-list');
+  const visibleFaqs = Array.isArray(faqs) ? faqs.filter((item) => item.visible !== false && item.question && item.answer) : [];
+  if (!faqSection || !faqList || !visibleFaqs.length) return;
+  faqSection.querySelector('.faq-view-all')?.remove();
+  document.querySelector('#faq-modal')?.remove();
+  faqList.innerHTML = visibleFaqs.slice(0, 4).map((item) => `<details><summary>${html(item.question)}</summary><p>${html(item.answer)}</p></details>`).join('');
+  if (visibleFaqs.length <= 4) return;
+  const action = document.createElement('div');
+  action.className = 'faq-view-all';
+  action.innerHTML = '<button class="button" type="button">View all FAQs <span>&rarr;</span></button>';
+  faqList.insertAdjacentElement('afterend', action);
+  const modal = document.createElement('div');
+  modal.className = 'faq-modal';
+  modal.id = 'faq-modal';
+  modal.hidden = true;
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'faq-modal-title');
+  modal.innerHTML = `<div class="faq-modal-card"><button class="faq-modal-close" type="button" aria-label="Close all FAQs">&times;</button><h2 id="faq-modal-title">More answers</h2><p>Everything you may want to know before starting your learning journey.</p><div class="faq-list">${visibleFaqs.slice(4).map((item) => `<details><summary>${html(item.question)}</summary><p>${html(item.answer)}</p></details>`).join('')}</div></div>`;
+  document.body.append(modal);
+  const hideFaqModal = () => { modal.hidden = true; action.querySelector('button')?.focus(); };
+  action.querySelector('button')?.addEventListener('click', () => { modal.hidden = false; modal.querySelector('.faq-modal-close')?.focus(); });
+  modal.querySelector('.faq-modal-close')?.addEventListener('click', hideFaqModal);
+  modal.addEventListener('click', (event) => { if (event.target === modal) hideFaqModal(); });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.hidden) hideFaqModal(); });
+}
+
 async function loadManagedContent() {
   try {
     const response = await fetch('/api/content');
     if (!response.ok) return;
     const content = await response.json();
+    window.setTimeout(() => renderManagedFaqs(content.faqs), 0);
     const courseList = document.querySelector('.fee-grid');
     const visibleCourses = content.courses?.filter((course) => course.visible !== false) || [];
     if (courseList && visibleCourses.length) {

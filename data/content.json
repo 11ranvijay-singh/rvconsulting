@@ -4,6 +4,18 @@
     { "id": "aml-fraud", "title": "AML / KYC & Fraud Investigation", "duration": "3-month programme", "oldPrice": "INR 50,000", "price": "INR 36,000", "note": "Course fee", "featured": false }
   ],
   "offerLetters": [],
+  "faqs": [
+    { "question": "Who can join these programmes?", "answer": "The programmes are suitable for freshers, professionals in banking or operations, and anyone building AML, KYC, fraud or crypto-investigation knowledge.", "visible": true },
+    { "question": "Do I need previous AML or KYC experience?", "answer": "No. The learning path starts with essential concepts and moves into practical review and investigation exercises.", "visible": true },
+    { "question": "What is the learning format?", "answer": "Training combines structured lessons, practical scenarios, guided revision and exercises that support investigation-ready understanding.", "visible": true },
+    { "question": "Is there a demo class available?", "answer": "Yes. Contact RV Consulting for details on the next demo class and how to join.", "visible": true },
+    { "question": "What does career support include?", "answer": "Support focuses on course selection, career preparation and guidance for developing job-relevant investigation skills. Contact the team for current details.", "visible": true },
+    { "question": "How can I request study material or enrol?", "answer": "Use the WhatsApp buttons on the website or call RV Consulting directly. The team can guide you one-to-one on the appropriate next step.", "visible": true },
+    { "question": "What are the payment and refund terms?", "answer": "We encourage you to choose your programme with full clarity, and our team is happy to guide you before payment. Once a payment is made, course, study-material and related-service fees are non-refundable. Please review the Cancellation & Refund Policy and confirm your course and payment arrangement with RV Consulting before enrolling.", "visible": true },
+    { "question": "How is my enquiry information used?", "answer": "Your enquiry details are used to respond to your course request and provide relevant guidance. Do not share sensitive information through public forms or chats.", "visible": true },
+    { "question": "Does career support guarantee a job?", "answer": "Career support is guidance for preparation and job-relevant skills. It does not guarantee employment, an interview or an offer.", "visible": true },
+    { "question": "Can I pay my course fee in instalments?", "answer": "Yes. You can divide the total course fee equally across the course duration. For example, for a 4-month course priced at ₹40,000, you can pay ₹10,000 per month. The monthly instalment is calculated by dividing the total course fee by the number of course months. Contact RV Consulting to confirm the instalment schedule for your selected course.", "visible": true }
+  ],
   "studyMaterials": [
     { "title": "ACAMS Study Handbook", "institution": "RV Consulting Institute", "edition": "Handbook Edition: 2023–2026", "subtitle": "Certified Anti-Money Laundering Specialist (CAMS)", "description": "A clean, professionally organised study guide designed for AML/KYC learners.", "oldPrice": "₹15,000", "price": "₹9,999", "note": "Study-material access", "whatsappMessage": "Hi RV Consulting, I want to get access to the ACAMS Study Handbook notes for ₹9,999.", "visible": true }
   ],

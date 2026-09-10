@@ -74,6 +74,7 @@ http.createServer(async (request, response) => {
       if (!Array.isArray(content.courses) || !Array.isArray(content.testimonials)) return sendJson(response, 400, { error: 'Courses and testimonials are required.' });
       if (!Array.isArray(content.offerLetters)) content.offerLetters = [];
       if (!Array.isArray(content.studyMaterials)) content.studyMaterials = [];
+      if (!Array.isArray(content.faqs)) content.faqs = [];
       if (!content.demoClass || typeof content.demoClass !== 'object' || Array.isArray(content.demoClass)) content.demoClass = {};
       content.testimonials = content.testimonials.map(saveProofImage);
       content.offerLetters = content.offerLetters.map(saveOfferLetterImage);
