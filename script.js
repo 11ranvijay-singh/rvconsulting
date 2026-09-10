@@ -296,3 +296,24 @@ window.setTimeout(() => {
   modal.addEventListener('click', (event) => { if (event.target === modal) hideFaqModal(); });
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.hidden) hideFaqModal(); });
 }, 0);
+const mobileMenuToggle = document.querySelector('#mobile-menu-toggle');
+const mobileMenu = document.querySelector('#mobile-menu');
+
+const closeMobileMenu = () => {
+  if (!mobileMenu || !mobileMenuToggle) return;
+  mobileMenu.hidden = true;
+  mobileMenuToggle.classList.remove('is-open');
+  mobileMenuToggle.setAttribute('aria-expanded', 'false');
+  mobileMenuToggle.setAttribute('aria-label', 'Open menu');
+};
+
+mobileMenuToggle?.addEventListener('click', () => {
+  const isOpen = !mobileMenu.hidden;
+  mobileMenu.hidden = isOpen;
+  mobileMenuToggle.classList.toggle('is-open', !isOpen);
+  mobileMenuToggle.setAttribute('aria-expanded', String(!isOpen));
+  mobileMenuToggle.setAttribute('aria-label', isOpen ? 'Open menu' : 'Close menu');
+});
+
+mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobileMenu));
+window.addEventListener('resize', () => { if (window.innerWidth > 760) closeMobileMenu(); });
