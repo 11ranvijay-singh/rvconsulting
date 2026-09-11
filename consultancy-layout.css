@@ -1,0 +1,4 @@
+/* Employer grid: balanced on larger screens and three names per row on phones. */
+.consultancy-companies div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.consultancy-companies span{display:flex;align-items:center;justify-content:center;min-height:42px;text-align:center}
+@media(max-width:760px){.consultancy-companies div{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.consultancy-companies span{min-height:44px;padding:7px 5px;font-size:9px}}
