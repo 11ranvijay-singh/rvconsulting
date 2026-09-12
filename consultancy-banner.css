@@ -1,0 +1,40 @@
+.consultancy-banner {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+  margin: 0 0 25px;
+  padding: 16px 22px;
+  background: linear-gradient(135deg, #102f69, #0a204c);
+  color: #fff;
+  border: 1px solid rgba(244, 180, 0, .72);
+  border-radius: 6px;
+  box-shadow: 0 0 14px rgba(244, 180, 0, .55), 0 0 32px rgba(32, 88, 181, .32);
+  font-weight: 700;
+  letter-spacing: .55px;
+}
+
+.consultancy-banner span { display: block; }
+.consultancy-banner-brand { color: #fff; font-size: 15px; letter-spacing: .9px; }
+.consultancy-banner-message { color: #f7c52b; font-size: 18px; letter-spacing: .7px; }
+.consultancy-banner-location { color: #fff; font-size: 13px; letter-spacing: .45px; }
+
+@media (max-width: 760px) {
+  .consultancy-banner {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 30px;
+    padding: 22px 18px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 0 16px rgba(244, 180, 0, .7), 0 0 38px rgba(32, 88, 181, .42);
+  }
+
+  .consultancy-banner-brand { font-size: 18px; }
+  .consultancy-banner-message { font-size: 21px; line-height: 1.15; }
+  .consultancy-banner-location { font-size: 14px; line-height: 1.3; }
+}
