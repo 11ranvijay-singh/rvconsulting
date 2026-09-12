@@ -13,3 +13,5 @@
 /* Fixed course-enquiry chat shortcut. */
 .floating-whatsapp-chat{position:fixed;top:96px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;padding:12px 15px;background:#25d366;color:#073a20;border:2px solid #fff;border-radius:999px;box-shadow:0 7px 20px rgba(12,96,48,.35);font:800 13px 'DM Sans',sans-serif;text-decoration:none;transition:transform .2s,box-shadow .2s}.floating-whatsapp-chat:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 25px rgba(12,96,48,.45)}.floating-whatsapp-chat img{width:23px;height:23px}@media(max-width:800px){.floating-whatsapp-chat{top:78px;right:12px;padding:10px 12px;font-size:12px}.floating-whatsapp-chat img{width:21px;height:21px}}@media(max-width:390px){.floating-whatsapp-chat span{display:none}.floating-whatsapp-chat{padding:11px;top:74px}}
 .floating-whatsapp-chat img{padding:3px;background:#fff;border-radius:50%}
+.floating-whatsapp-chat img{width:18px;height:18px}
+@media(max-width:800px){.floating-whatsapp-chat img{width:17px;height:17px}}
