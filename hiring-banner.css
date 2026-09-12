@@ -9,4 +9,4 @@
 .hiring-contact-button{min-width:190px;padding:13px 18px;font-size:15px}
 .hiring-contact-button img,.hiring-contact-button svg{width:21px;height:21px}
 
-@media(max-width:800px){.top-hiring-banner{box-sizing:border-box;min-height:50svh;gap:9px;padding:30px 5%}.top-hiring-status{padding:10px 18px;font-size:18px}.top-hiring-text{font-size:20px}.top-hiring-link{font-size:14px}.hiring-contact-actions{gap:9px;margin-top:5px}.hiring-contact-button{padding:11px 9px;font-size:12px}.hiring-contact-button img,.hiring-contact-button svg{width:18px;height:18px}}
+@media(max-width:800px){.top-hiring-banner{box-sizing:border-box;justify-content:space-evenly;min-height:50svh;gap:0;padding:18px 5%}.top-hiring-status{padding:13px 23px;font-size:22px;letter-spacing:2.2px}.top-hiring-text{max-width:360px;font-size:28px;line-height:1.15}.top-hiring-link{font-size:16px}.hiring-contact-actions{flex-direction:column;width:100%;max-width:360px;gap:10px;margin:0}.hiring-contact-button{width:100%;min-height:62px;padding:13px 16px;font-size:16px}.hiring-contact-button img,.hiring-contact-button svg{width:22px;height:22px}}
