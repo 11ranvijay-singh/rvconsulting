@@ -5,6 +5,7 @@ const crypto = require('crypto');
 
 const root = __dirname;
 const database = path.join(root, 'data', 'content.json');
+const analyticsDatabase = path.join(root, 'data', 'analytics.json');
 const proofDirectory = path.join(root, 'assets', 'testimonial-proofs');
 const offerLetterDirectory = path.join(root, 'assets', 'offer-letter-uploads');
 const maxAdminRequestBytes = 8 * 1024 * 1024;
@@ -18,6 +19,37 @@ const sendJson = (response, status, body) => {
 };
 const readContent = () => JSON.parse(fs.readFileSync(database, 'utf8'));
 const writeContent = (content) => fs.writeFileSync(database, `${JSON.stringify(content, null, 2)}\n`);
+const readAnalytics = () => {
+  try { return JSON.parse(fs.readFileSync(analyticsDatabase, 'utf8')); } catch { return { days: {} }; }
+};
+const writeAnalytics = (analytics) => fs.writeFileSync(analyticsDatabase, `${JSON.stringify(analytics, null, 2)}\n`);
+const visitorDay = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+const isPageVisit = (request, pathname) => request.method === 'GET' && (pathname === '/' || pathname.endsWith('.html')) && !pathname.startsWith('/admin');
+const recordVisit = (request) => {
+  const day = visitorDay();
+  const forwarded = request.headers['x-forwarded-for'];
+  const address = typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : request.socket.remoteAddress || '';
+  const agent = request.headers['user-agent'] || '';
+  if (!address || /bot|crawler|spider|preview|lighthouse/i.test(agent)) return;
+  const analytics = readAnalytics();
+  const entry = analytics.days[day] ||= { uniqueVisitors: 0, visitorIds: [] };
+  const visitorId = crypto.createHash('sha256').update(`${day}\0${address}\0${agent}`).digest('hex');
+  if (!entry.visitorIds.includes(visitorId)) { entry.visitorIds.push(visitorId); entry.uniqueVisitors += 1; }
+  Object.entries(analytics.days).forEach(([date, value]) => {
+    if (date !== day && Array.isArray(value.visitorIds)) delete value.visitorIds;
+    if (date < new Date(Date.now() - 180 * 86400000).toISOString().slice(0, 10)) delete analytics.days[date];
+  });
+  writeAnalytics(analytics);
+};
+const analyticsSummary = () => {
+  const days = readAnalytics().days || {}; const today = visitorDay();
+  const trend = Array.from({ length: 30 }, (_, offset) => {
+    const date = new Date(`${today}T12:00:00+05:30`); date.setDate(date.getDate() - (29 - offset));
+    const key = date.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    return { date: key, visitors: days[key]?.uniqueVisitors || 0 };
+  });
+  return { today, todayVisitors: days[today]?.uniqueVisitors || 0, last30DaysVisitors: trend.reduce((total, item) => total + item.visitors, 0), trend };
+};
 const authorised = (request) => {
   const value = request.headers.authorization || '';
   const expected = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
@@ -66,6 +98,10 @@ const saveOfferLetterImage = (offerLetter) => {
 http.createServer(async (request, response) => {
   const url = new URL(request.url, 'http://localhost');
   if (url.pathname === '/api/content' && request.method === 'GET') return sendJson(response, 200, readContent());
+  if (url.pathname === '/api/analytics' && request.method === 'GET') {
+    if (!requireAdmin(request, response)) return;
+    return sendJson(response, 200, analyticsSummary());
+  }
   if (url.pathname === '/admin.html' && !requireAdmin(request, response)) return;
   if (url.pathname === '/api/content' && request.method === 'PUT') {
     if (!requireAdmin(request, response)) return;
@@ -83,6 +119,7 @@ http.createServer(async (request, response) => {
     } catch (error) { return sendJson(response, 400, { error: error.message }); }
   }
   const pathname = url.pathname === '/' ? '/index.html' : url.pathname;
+  if (isPageVisit(request, url.pathname)) recordVisit(request);
   if (pathname === '/server.js' || pathname.startsWith('/data/') || pathname.startsWith('/.github-cli')) return response.writeHead(404).end('Not found');
   const file = path.resolve(root, `.${decodeURIComponent(pathname)}`);
   if (!file.startsWith(`${root}${path.sep}`)) return response.writeHead(403).end('Forbidden');
