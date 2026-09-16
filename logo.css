@@ -6,3 +6,4 @@
 .footer-logo{max-width:230px!important;height:72px!important;padding:5px 10px!important;background:#fff!important}
 .footer-logo img{width:100%!important;height:62px!important;max-height:none!important;object-fit:contain}
 @media(max-width:800px){.footer-logo{max-width:190px!important;height:62px!important}.footer-logo img{height:52px!important}}
+@media(min-width:801px){footer .footer-logo{margin-right:36px}}
