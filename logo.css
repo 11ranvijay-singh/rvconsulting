@@ -3,3 +3,6 @@
 .site-header .logo-image{max-width:250px!important;height:86px!important;padding:6px 12px;background:#fff!important;border-radius:4px}
 .site-header .logo-image img{width:100%!important;height:74px!important;max-height:none!important;object-fit:contain}
 @media(max-width:800px){.site-header{height:94px!important}.site-header .logo-image{max-width:200px!important;height:84px!important;padding:4px 8px}.site-header .logo-image img{height:78px!important}}
+.footer-logo{max-width:230px!important;height:72px!important;padding:5px 10px!important;background:#fff!important}
+.footer-logo img{width:100%!important;height:62px!important;max-height:none!important;object-fit:contain}
+@media(max-width:800px){.footer-logo{max-width:190px!important;height:62px!important}.footer-logo img{height:52px!important}}
