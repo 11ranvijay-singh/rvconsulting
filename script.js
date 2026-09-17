@@ -317,3 +317,22 @@ mobileMenuToggle?.addEventListener('click', () => {
 
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobileMenu));
 window.addEventListener('resize', () => { if (window.innerWidth > 760) closeMobileMenu(); });
+
+// Highlight placement-related videos immediately before the employer opportunities.
+const placementSection = document.querySelector('.placement-section');
+if (placementSection) {
+  placementSection.insertAdjacentHTML('afterbegin', `
+    <div class="placement-videos" aria-label="Placement opportunity videos">
+      <a class="placement-video-card" href="https://youtu.be/PLtOi_QxDVk" target="_blank" rel="noopener">
+        <div class="placement-video-thumb"><img src="assets/video-PLtOi_QxDVk.jpg" alt="Work from home and hybrid opportunity video thumbnail"><span>▶</span></div>
+        <div><small>PLACEMENT OPPORTUNITIES</small><h3>Work From Home &amp; Hybrid Opportunity After AML/KYC &amp; Fraud Investigation &amp; Crypto Course</h3><p>Watch on YouTube <b>→</b></p></div>
+      </a>
+      <a class="placement-video-card" href="https://youtu.be/OAxoADhdqYY?si=eNktZeLw3WurIdMS" target="_blank" rel="noopener">
+        <div class="placement-video-thumb"><img src="assets/video-OAxoADhdqYY-placement.jpg" alt="AML KYC fraud investigation crypto and AI course placements video thumbnail"><span>▶</span></div>
+        <div><small>PLACEMENT OPPORTUNITIES</small><h3>AML/KYC, Fraud Investigation, Crypto &amp; AI Course Job Placements in Top MNCs</h3><p>Watch on YouTube <b>→</b></p></div>
+      </a>
+    </div>`);
+  const placementVideoStyles = document.createElement('style');
+  placementVideoStyles.textContent = `.placement-videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-bottom:72px}.placement-video-card{display:grid;grid-template-columns:43% 1fr;gap:18px;align-items:center;padding:12px;border:1px solid #D6E2F3;background:#fff;color:#0F2A5F;text-decoration:none;box-shadow:0 8px 20px rgba(15,42,95,.06);transition:transform .2s,box-shadow .2s}.placement-video-card:hover{transform:translateY(-3px);box-shadow:0 14px 26px rgba(15,42,95,.13)}.placement-video-thumb{position:relative;aspect-ratio:16/10;overflow:hidden;background:#0F2A5F}.placement-video-thumb:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(15,42,95,.38))}.placement-video-thumb img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .25s}.placement-video-card:hover img{transform:scale(1.05)}.placement-video-thumb span{position:absolute;z-index:1;left:14px;bottom:12px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#F4B400;color:#0F2A5F;font-size:10px;padding-left:2px}.placement-video-card small{font-size:9px;letter-spacing:1.1px;font-weight:700;color:#B37E00}.placement-video-card h3{font:600 17px/1.18 'Playfair Display',serif;letter-spacing:-.35px;margin:7px 0;color:#0F2A5F}.placement-video-card p{margin:0;font-size:11px;font-weight:700;color:#607089}.placement-video-card p b{color:#C58E00;font-size:16px;margin-left:3px}@media(max-width:800px){.placement-videos{grid-template-columns:1fr;margin-bottom:54px}.placement-video-card{grid-template-columns:42% 1fr;gap:13px}.placement-video-card h3{font-size:16px}}@media(max-width:430px){.placement-video-card{grid-template-columns:1fr}.placement-video-thumb{aspect-ratio:16/9}}`;
+  document.head.appendChild(placementVideoStyles);
+}
