@@ -343,12 +343,6 @@ if (placementSection) {
   const headingHighlightStyles = document.createElement('style');
   headingHighlightStyles.textContent = `.placement-video-intro .placement-video-title{display:inline-block;padding:14px 30px;border:1px solid rgba(244,180,0,.72);background:linear-gradient(110deg,#fff8df,#fff 48%,#fff3c7);box-shadow:0 0 0 5px rgba(244,180,0,.1),0 10px 28px rgba(197,142,0,.18);border-radius:4px;text-shadow:0 0 10px rgba(244,180,0,.5);animation:placementTitleHighlight 2s ease-in-out infinite}@keyframes placementTitleHighlight{50%{box-shadow:0 0 0 8px rgba(244,180,0,.17),0 12px 32px rgba(197,142,0,.3);transform:translateY(-2px)}}@media(max-width:500px){.placement-video-intro .placement-video-title{padding:12px 16px}}@media(prefers-reduced-motion:reduce){.placement-video-intro .placement-video-title{animation:none}}`;
   document.head.appendChild(headingHighlightStyles);
-  const blueHeadingGlowStyles = document.createElement('style');
-  blueHeadingGlowStyles.textContent = `.placement-video-intro .placement-video-title{border-color:rgba(38,137,255,.8);background:linear-gradient(110deg,#e5f2ff,#fff 48%,#d9edff);box-shadow:0 0 0 5px rgba(38,137,255,.11),0 10px 28px rgba(18,94,190,.2);text-shadow:0 0 10px rgba(38,137,255,.52);animation:blueHeadingPulse 2s ease-in-out infinite}@keyframes blueHeadingPulse{50%{box-shadow:0 0 0 8px rgba(38,137,255,.2),0 12px 34px rgba(18,94,190,.34);transform:translateY(-2px)}}@media(prefers-reduced-motion:reduce){.placement-video-intro .placement-video-title{animation:none}}`;
-  document.head.appendChild(blueHeadingGlowStyles);
-  const finalHeadingStyles = document.createElement('style');
-  finalHeadingStyles.textContent = `.placement-video-intro .placement-video-title{color:#fff;background:linear-gradient(110deg,#0F2A5F,#174B8D 52%,#0F2A5F);border-color:#F4B400;text-shadow:0 0 9px rgba(244,180,0,.72);box-shadow:0 0 0 5px rgba(244,180,0,.12),0 10px 28px rgba(15,42,95,.3);animation:yellowHeadingGlow 2s ease-in-out infinite}@keyframes yellowHeadingGlow{50%{box-shadow:0 0 0 8px rgba(244,180,0,.2),0 0 29px 8px rgba(244,180,0,.48);transform:translateY(-2px)}}@media(prefers-reduced-motion:reduce){.placement-video-intro .placement-video-title{animation:none}}`;
-  document.head.appendChild(finalHeadingStyles);
 
 }
 
