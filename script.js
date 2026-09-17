@@ -338,15 +338,14 @@ if (placementSection) {
   const placementVideoStyles = document.createElement('style');
   placementVideoStyles.textContent = `.placement-video-intro{text-align:center;margin:0 auto 27px}.placement-video-intro .eyebrow{justify-content:center}.placement-video-intro h2{font:600 34px/1.14 'Playfair Display',serif;letter-spacing:-1px;color:#0F2A5F;margin:10px 0 0;text-shadow:0 0 0 rgba(244,180,0,0);animation:placementHeadingGlow 2.5s ease-in-out infinite}.placement-videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-bottom:72px}.placement-video-card{display:grid;grid-template-columns:43% 1fr;gap:18px;align-items:center;padding:12px;border:1px solid #D6E2F3;background:#fff;color:#0F2A5F;text-decoration:none;box-shadow:0 8px 20px rgba(15,42,95,.06);transition:transform .2s,box-shadow .2s}.placement-video-card:hover{transform:translateY(-3px);box-shadow:0 14px 26px rgba(15,42,95,.13)}.placement-video-thumb{position:relative;aspect-ratio:16/10;overflow:hidden;background:#0F2A5F}.placement-video-thumb:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(15,42,95,.38))}.placement-video-thumb img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .25s}.placement-video-card:hover img{transform:scale(1.05)}.placement-video-thumb span{position:absolute;z-index:1;left:14px;bottom:12px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#F4B400;color:#0F2A5F;font-size:10px;padding-left:2px;box-shadow:0 0 0 rgba(244,180,0,0);animation:placementPlayGlow 2.5s ease-in-out infinite}.placement-video-card:hover .placement-video-thumb span{animation:none;box-shadow:0 0 18px 5px rgba(244,180,0,.68)}.placement-video-card small{font-size:9px;letter-spacing:1.1px;font-weight:700;color:#B37E00}.placement-video-card h3{font:600 17px/1.18 'Playfair Display',serif;letter-spacing:-.35px;margin:7px 0;color:#0F2A5F}.placement-video-card p{margin:0;font-size:11px;font-weight:700;color:#607089}.placement-video-card p b{color:#C58E00;font-size:16px;margin-left:3px}@keyframes placementHeadingGlow{50%{text-shadow:0 0 8px rgba(244,180,0,.55),0 0 20px rgba(244,180,0,.24)}}@keyframes placementPlayGlow{50%{box-shadow:0 0 16px 5px rgba(244,180,0,.6)}}@media(prefers-reduced-motion:reduce){.placement-video-intro h2,.placement-video-thumb span{animation:none}}@media(max-width:800px){.placement-video-intro h2{font-size:29px}.placement-videos{grid-template-columns:1fr;margin-bottom:54px}.placement-video-card{grid-template-columns:42% 1fr;gap:13px}.placement-video-card h3{font-size:16px}}@media(max-width:430px){.placement-video-card{grid-template-columns:1fr}.placement-video-thumb{aspect-ratio:16/9}}`;
   document.head.appendChild(placementVideoStyles);
+  const highlightedHeading = placementSection.querySelector('.placement-video-intro h2');
+  highlightedHeading?.classList.add('placement-video-title');
+  const headingHighlightStyles = document.createElement('style');
+  headingHighlightStyles.textContent = `.placement-video-intro .placement-video-title{display:inline-block;padding:14px 30px;border:1px solid rgba(244,180,0,.72);background:linear-gradient(110deg,#fff8df,#fff 48%,#fff3c7);box-shadow:0 0 0 5px rgba(244,180,0,.1),0 10px 28px rgba(197,142,0,.18);border-radius:4px;text-shadow:0 0 10px rgba(244,180,0,.5);animation:placementTitleHighlight 2s ease-in-out infinite}@keyframes placementTitleHighlight{50%{box-shadow:0 0 0 8px rgba(244,180,0,.17),0 12px 32px rgba(197,142,0,.3);transform:translateY(-2px)}}@media(max-width:500px){.placement-video-intro .placement-video-title{padding:12px 16px}}@media(prefers-reduced-motion:reduce){.placement-video-intro .placement-video-title{animation:none}}`;
+  document.head.appendChild(headingHighlightStyles);
 
-  const hclCard = placementSection.querySelector('.company-logo.hcl');
-  const additionalCompanies = [
-    ['CX', 'Concentrix'], ['CG', 'Cognizant'], ['CP', 'Capgemini'], ['IB', 'Infosys<br>BPM'],
-    ['TCS', 'Tata Consultancy<br>Services'], ['SU', 'Sutherland'], ['FV', 'Foundever']
-  ];
-  if (hclCard) {
-    hclCard.insertAdjacentHTML('beforebegin', additionalCompanies.map(([mark, name]) =>
-      `<div class="company-logo"><i>${mark}</i><b>${name}</b></div>`
-    ).join(''));
-  }
 }
+
+const employerStrip = document.querySelector('.mncs');
+const hclEmployer = [...employerStrip?.querySelectorAll('b') || []].find((company) => company.textContent.trim() === 'HCL');
+if (hclEmployer) hclEmployer.insertAdjacentHTML('beforebegin', '<b>And many more</b>');
