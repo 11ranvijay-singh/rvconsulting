@@ -158,7 +158,7 @@ doc.save(OUT / 'RV_Certificate_Editable.docx')
 # including name and date, is painted into one image before it is embedded.
 final = Image.open(background).convert('RGB')
 final_draw = ImageDraw.Draw(final)
-script_font_candidates = (r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
+script_font_candidates = (str(ASSETS / 'GreatVibes-Regular.ttf'), r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
 
 def fitted_font(text, initial_size, max_width):
     for size in range(initial_size, 31, -2):
