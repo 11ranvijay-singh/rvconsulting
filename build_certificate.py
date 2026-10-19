@@ -158,24 +158,25 @@ doc.save(OUT / 'RV_Certificate_Editable.docx')
 # including name and date, is painted into one image before it is embedded.
 final = Image.open(background).convert('RGB')
 final_draw = ImageDraw.Draw(final)
-script_font_candidates = (str(ASSETS / 'GreatVibes-Regular.ttf'), r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
+name_font_candidates = (str(ASSETS / 'GreatVibes-Regular.ttf'), r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
+date_font_candidates = (str(ASSETS / 'Merriweather-Italic.ttf'), '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
 
-def fitted_font(text, initial_size, max_width):
+def fitted_font(text, initial_size, max_width, candidates, stroke_width=0):
     for size in range(initial_size, 31, -2):
-        font = load_font(size, *script_font_candidates)
-        if final_draw.textbbox((0, 0), text, font=font, stroke_width=1)[2] <= max_width:
+        font = load_font(size, *candidates)
+        if final_draw.textbbox((0, 0), text, font=font, stroke_width=stroke_width)[2] <= max_width:
             return font
-    return load_font(32, *script_font_candidates)
+    return load_font(32, *candidates)
 
-name_font = fitted_font('Chetna', 82, 850)
-date_font = fitted_font('17th AUGUST 2026', 62, 650)
+name_font = fitted_font('Chetna', 82, 850, name_font_candidates, stroke_width=1)
+date_font = fitted_font('17th AUGUST 2026', 58, 650, date_font_candidates)
 
-def centered_text(y, text, font):
-    bbox = final_draw.textbbox((0, 0), text, font=font, stroke_width=1)
+def centered_text(y, text, font, stroke_width=0):
+    bbox = final_draw.textbbox((0, 0), text, font=font, stroke_width=stroke_width)
     x = (final.width - (bbox[2] - bbox[0])) / 2
-    final_draw.text((x, y), text, fill='black', font=font, stroke_width=1, stroke_fill='black')
+    final_draw.text((x, y), text, fill='black', font=font, stroke_width=stroke_width, stroke_fill='black')
 
-centered_text(1007, 'Chetna', name_font)
+centered_text(1007, 'Chetna', name_font, stroke_width=1)
 centered_text(1142, '17th AUGUST 2026', date_font)
 flattened_image = OUT / 'RV_Certificate_Flattened.png'
 final.save(flattened_image, quality=98)
