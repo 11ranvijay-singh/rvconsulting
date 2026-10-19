@@ -113,8 +113,11 @@ http.createServer(async (request, response) => {
       const format = 'pdf';
       if (typeof name !== 'string' || !name.trim() || name.length > 80) return sendJson(response, 400, { error: 'A recipient name of up to 80 characters is required.' });
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return sendJson(response, 400, { error: 'Provide a valid certificate date.' });
-      execFile(certificatePython, [path.join(root, 'certificate_generator.py'), '--name', name.trim(), '--date', date, '--format', format], { cwd: root }, error => {
-        if (error) return sendJson(response, 500, { error: 'Certificate generation failed. Repair the Python environment and try again.' });
+      execFile(certificatePython, [path.join(root, 'certificate_generator.py'), '--name', name.trim(), '--date', date, '--format', format], { cwd: root, timeout: 120000 }, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Certificate generation failed', { executable: certificatePython, error: error.message, stdout, stderr });
+          return sendJson(response, 500, { error: 'Certificate generation failed. Check the Render service logs for details.' });
+        }
         const file = path.join(certificateDirectory, 'RV_Certificate_Flattened.pdf');
         fs.readFile(file, (readError, data) => {
           if (readError) return sendJson(response, 500, { error: 'Certificate output was not created.' });
