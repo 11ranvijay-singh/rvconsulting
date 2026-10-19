@@ -158,13 +158,22 @@ doc.save(OUT / 'RV_Certificate_Editable.docx')
 # including name and date, is painted into one image before it is embedded.
 final = Image.open(background).convert('RGB')
 final_draw = ImageDraw.Draw(final)
-name_font = load_font(82, r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
-date_font = load_font(67, r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
+script_font_candidates = (r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
+
+def fitted_font(text, initial_size, max_width):
+    for size in range(initial_size, 31, -2):
+        font = load_font(size, *script_font_candidates)
+        if final_draw.textbbox((0, 0), text, font=font, stroke_width=1)[2] <= max_width:
+            return font
+    return load_font(32, *script_font_candidates)
+
+name_font = fitted_font('Chetna', 82, 850)
+date_font = fitted_font('17th AUGUST 2026', 62, 650)
 
 def centered_text(y, text, font):
-    bbox = final_draw.textbbox((0, 0), text, font=font)
+    bbox = final_draw.textbbox((0, 0), text, font=font, stroke_width=1)
     x = (final.width - (bbox[2] - bbox[0])) / 2
-    final_draw.text((x, y), text, fill='black', font=font)
+    final_draw.text((x, y), text, fill='black', font=font, stroke_width=1, stroke_fill='black')
 
 centered_text(1007, 'Chetna', name_font)
 centered_text(1142, '17th AUGUST 2026', date_font)

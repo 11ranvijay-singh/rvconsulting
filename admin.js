@@ -31,7 +31,9 @@ const saveSection = async (name) => { status(`Saving ${name}...`); try { const r
 const generateCertificate = async () => {
   const name = byId('certificate-name').value.trim();
   const date = byId('certificate-date').value;
+  const button = byId('generate-certificate');
   if (!name || !date) return status('Enter the recipient name and certificate date.', true);
+  button.disabled = true; button.classList.add('is-loading'); button.textContent = 'Generating PDF certificate';
   status('Generating PDF certificate...');
   try {
     const response = await fetch('/api/certificates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, date }) });
@@ -40,11 +42,17 @@ const generateCertificate = async () => {
     link.href = url; link.download = `RV_Certificate_${name.replace(/[^a-z0-9]+/gi, '_')}.pdf`; link.click(); URL.revokeObjectURL(url);
     status('PDF certificate generated.');
   } catch (error) { status(error.message || 'Certificate generation failed.', true); }
+  finally { button.disabled = false; button.classList.remove('is-loading'); button.textContent = 'Generate PDF certificate'; }
+};
+const showSelectedCertificateDate = () => {
+  const value = byId('certificate-date').value;
+  byId('certificate-date-display').textContent = value ? `Selected certificate date: ${new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${value}T12:00:00`))}` : 'No certificate date selected.';
 };
 
 document.addEventListener('input', (event) => { const article = event.target.closest('article'); if (!article || !event.target.dataset.key || event.target.type === 'file') return; const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value; if (article.dataset.type === 'demoClass') content.demoClass[event.target.dataset.key] = value; else content[article.dataset.type][article.dataset.index][event.target.dataset.key] = value; });
 document.addEventListener('change', (event) => { const article = event.target.closest('article'); const file = event.target.files?.[0]; const key = event.target.dataset.key; if (!article || !file || !['proofUpload', 'offerLetterUpload'].includes(key)) return; const allowedType = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || /\.(png|jpe?g|webp)$/i.test(file.name); if (!allowedType) { status('Unsupported image type. Please upload only PNG, JPG, or WebP images.', true); event.target.value = ''; return; } if (file.size > 5 * 1024 * 1024) { status('Image is too large. The maximum allowed size is 5 MB.', true); event.target.value = ''; return; } const reader = new FileReader(); reader.onload = () => { const item = content[article.dataset.type][article.dataset.index]; if (key === 'proofUpload') item.proofImageData = reader.result; else item.imageData = reader.result; status('Image ready. Click the save button for this section.'); }; reader.readAsDataURL(file); });
 byId('analytics-period').addEventListener('change', renderAnalytics);
+byId('certificate-date').addEventListener('change', showSelectedCertificateDate);
 document.addEventListener('click', (event) => { const panelLink = event.target.closest('.menu-link'); if (panelLink) return showPanel(panelLink.dataset.panelTarget); if (event.target.closest('#refresh-analytics')) return loadAnalytics(); if (event.target.closest('#generate-certificate')) return generateCertificate(); const saveButton = event.target.closest('[data-save-section]'); if (saveButton) return saveSection(saveButton.dataset.saveSection); const article = event.target.closest('article'); if (event.target.classList.contains('remove') && article) { content[article.dataset.type].splice(article.dataset.index, 1); render(); } });
 byId('add-course').onclick = () => { content.courses.push({ title: 'New course', duration: '', oldPrice: '', price: '', note: '', featured: false, visible: true }); render(); };
 byId('add-faq').onclick = () => { content.faqs.push({ question: 'New question', answer: '', visible: true }); render(); };
