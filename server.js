@@ -34,7 +34,7 @@ const createCertificatePdf = async (name, date) => {
   const { width, height } = page.getSize();
   page.drawImage(background, { x: 0, y: 0, width, height });
   const drawCentered = (text, font, preferredSize, maxWidth, topY) => {
-    const size = Math.min(preferredSize, maxWidth / font.widthOfTextAtSize(text, preferredSize));
+    const size = preferredSize * Math.min(1, maxWidth / font.widthOfTextAtSize(text, preferredSize));
     const textWidth = font.widthOfTextAtSize(text, size);
     page.drawText(text, { x: (width - textWidth) / 2, y: height - topY * 0.4 - size, size, font, color: rgb(0, 0, 0) });
   };
