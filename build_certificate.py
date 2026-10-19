@@ -15,20 +15,11 @@ ASSETS = ROOT / "assets"
 OUT = ROOT / "output"
 OUT.mkdir(exist_ok=True)
 
-def font_path(*candidates):
+def load_font(size, *candidates):
     for candidate in candidates:
         if Path(candidate).exists():
-            return candidate
-    raise FileNotFoundError(f'No usable font found. Checked: {", ".join(candidates)}')
-
-body_font_path = font_path(
-    r'C:\Windows\Fonts\comic.ttf',
-    '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
-)
-script_font_path = font_path(
-    r'C:\Windows\Fonts\MTCORSVA.TTF',
-    '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf',
-)
+            return ImageFont.truetype(candidate, size)
+    return ImageFont.load_default(size=size)
 
 # Build a clean background that retains the supplied certificate's border, text,
 # seals and signatures while removing the previous brand, recipient and date.
@@ -44,7 +35,7 @@ for y in range(780, 1315):
 # Remove the remaining low-saturation watermark traces, then restore the two
 # intended foreground elements in that band.
 draw.rectangle((300, 825, 1190, 1315), fill="white")
-caption_font = ImageFont.truetype(body_font_path, 43)
+caption_font = load_font(43, r'C:\Windows\Fonts\comic.ttf', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
 caption = 'This Certificate is Proudly Presented to'
 caption_box = draw.textbbox((0, 0), caption, font=caption_font)
 draw.text(((base.width - (caption_box[2] - caption_box[0])) / 2, 850), caption, fill='black', font=caption_font)
@@ -53,7 +44,7 @@ draw.rectangle((390, 1280, 1110, 1340), fill="white")
 # Rebuild the course description on a clean white block so none of the prior
 # background logo remains visible through its lines.
 draw.rectangle((170, 1340, 1320, 1645), fill="white")
-course_font = ImageFont.truetype(body_font_path, 33)
+course_font = load_font(33, r'C:\Windows\Fonts\comic.ttf', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
 course_lines = [
     'For successfully completing the Advanced AML and KYC monitoring',
     'specialist Course. Your commitment to learning, active participation,',
@@ -167,8 +158,8 @@ doc.save(OUT / 'RV_Certificate_Editable.docx')
 # including name and date, is painted into one image before it is embedded.
 final = Image.open(background).convert('RGB')
 final_draw = ImageDraw.Draw(final)
-name_font = ImageFont.truetype(script_font_path, 82)
-date_font = ImageFont.truetype(script_font_path, 67)
+name_font = load_font(82, r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
+date_font = load_font(67, r'C:\Windows\Fonts\MTCORSVA.TTF', '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf')
 
 def centered_text(y, text, font):
     bbox = final_draw.textbbox((0, 0), text, font=font)
