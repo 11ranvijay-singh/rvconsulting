@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { execFile } = require('child_process');
+const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
 
 const root = __dirname;
 const database = path.join(root, 'data', 'content.json');
@@ -10,9 +10,7 @@ const analyticsDatabase = path.join(root, 'data', 'analytics.json');
 const proofDirectory = path.join(root, 'assets', 'testimonial-proofs');
 const offerLetterDirectory = path.join(root, 'assets', 'offer-letter-uploads');
 const maxAdminRequestBytes = 8 * 1024 * 1024;
-const certificateDirectory = path.join(root, 'output');
-const localCertificatePython = path.join(root, '.venv', 'Scripts', 'python.exe');
-const certificatePython = process.env.CERTIFICATE_PYTHON || (fs.existsSync(localCertificatePython) ? localCertificatePython : process.platform === 'win32' ? 'python' : 'python3');
+const certificateBackground = path.join(root, 'assets', 'certificate-background.png');
 const username = process.env.ADMIN_USERNAME || 'admin';
 const password = process.env.ADMIN_PASSWORD || 'ChangeMeNow123!';
 const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8', '.webp': 'image/webp', '.xml': 'application/xml; charset=utf-8' };
@@ -20,6 +18,29 @@ const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=
 const sendJson = (response, status, body) => {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
   response.end(JSON.stringify(body));
+};
+const ordinalDate = (value) => {
+  const date = new Date(`${value}T12:00:00Z`);
+  const day = date.getUTCDate();
+  const suffix = day >= 11 && day <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[day % 10] || 'th');
+  return `${day}${suffix} ${date.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' }).toUpperCase()} ${date.getUTCFullYear()}`;
+};
+const createCertificatePdf = async (name, date) => {
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([595.44, 841.68]);
+  const background = await pdf.embedPng(fs.readFileSync(certificateBackground));
+  const nameFont = await pdf.embedFont(StandardFonts.TimesRomanBoldItalic);
+  const dateFont = await pdf.embedFont(StandardFonts.TimesRomanItalic);
+  const { width, height } = page.getSize();
+  page.drawImage(background, { x: 0, y: 0, width, height });
+  const drawCentered = (text, font, preferredSize, maxWidth, topY) => {
+    const size = Math.min(preferredSize, maxWidth / font.widthOfTextAtSize(text, preferredSize));
+    const textWidth = font.widthOfTextAtSize(text, size);
+    page.drawText(text, { x: (width - textWidth) / 2, y: height - topY * 0.4 - size, size, font, color: rgb(0, 0, 0) });
+  };
+  drawCentered(name, nameFont, 34, 340, 1007);
+  drawCentered(ordinalDate(date), dateFont, 27, 260, 1142);
+  return Buffer.from(await pdf.save());
 };
 const readContent = () => JSON.parse(fs.readFileSync(database, 'utf8'));
 const writeContent = (content) => fs.writeFileSync(database, `${JSON.stringify(content, null, 2)}\n`);
@@ -113,19 +134,9 @@ http.createServer(async (request, response) => {
       const format = 'pdf';
       if (typeof name !== 'string' || !name.trim() || name.length > 80) return sendJson(response, 400, { error: 'A recipient name of up to 80 characters is required.' });
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return sendJson(response, 400, { error: 'Provide a valid certificate date.' });
-      execFile(certificatePython, [path.join(root, 'certificate_generator.py'), '--name', name.trim(), '--date', date, '--format', format], { cwd: root, timeout: 120000 }, (error, stdout, stderr) => {
-        if (error) {
-          console.error('Certificate generation failed', { executable: certificatePython, error: error.message, stdout, stderr });
-          const diagnostic = (stderr || error.message).trim().split(/\r?\n/).filter(Boolean).slice(-3).join(' ').slice(0, 900);
-          return sendJson(response, 500, { error: `Certificate generation failed: ${diagnostic || 'The generator exited unexpectedly.'}` });
-        }
-        const file = path.join(certificateDirectory, 'RV_Certificate_Flattened.pdf');
-        fs.readFile(file, (readError, data) => {
-          if (readError) return sendJson(response, 500, { error: 'Certificate output was not created.' });
-          response.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="RV_Certificate.pdf"' });
-          response.end(data);
-        });
-      });
+      const pdf = await createCertificatePdf(name.trim(), date);
+      response.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="RV_Certificate.pdf"' });
+      response.end(pdf);
     } catch (error) { return sendJson(response, 400, { error: error.message }); }
     return;
   }
