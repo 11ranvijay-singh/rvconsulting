@@ -3,7 +3,7 @@ FROM node:20-bookworm-slim
 WORKDIR /app
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 python3-venv \
+  && apt-get install -y --no-install-recommends python3 python3-venv fonts-dejavu-core \
   && rm -rf /var/lib/apt/lists/* \
   && python3 -m venv /opt/certificate-venv
 
