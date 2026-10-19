@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { execFile } = require('child_process');
 
 const root = __dirname;
 const database = path.join(root, 'data', 'content.json');
@@ -9,6 +10,8 @@ const analyticsDatabase = path.join(root, 'data', 'analytics.json');
 const proofDirectory = path.join(root, 'assets', 'testimonial-proofs');
 const offerLetterDirectory = path.join(root, 'assets', 'offer-letter-uploads');
 const maxAdminRequestBytes = 8 * 1024 * 1024;
+const certificateDirectory = path.join(root, 'output');
+const certificatePython = path.join(root, '.venv', 'Scripts', 'python.exe');
 const username = process.env.ADMIN_USERNAME || 'admin';
 const password = process.env.ADMIN_PASSWORD || 'ChangeMeNow123!';
 const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8', '.webp': 'image/webp', '.xml': 'application/xml; charset=utf-8' };
@@ -102,6 +105,26 @@ http.createServer(async (request, response) => {
     if (!requireAdmin(request, response)) return;
     return sendJson(response, 200, analyticsSummary());
   }
+  if (url.pathname === '/api/certificates' && request.method === 'POST') {
+    if (!requireAdmin(request, response)) return;
+    try {
+      const { name, date } = await readBody(request);
+      const format = 'pdf';
+      if (typeof name !== 'string' || !name.trim() || name.length > 80) return sendJson(response, 400, { error: 'A recipient name of up to 80 characters is required.' });
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return sendJson(response, 400, { error: 'Provide a valid certificate date.' });
+      execFile(certificatePython, [path.join(root, 'certificate_generator.py'), '--name', name.trim(), '--date', date, '--format', format], { cwd: root }, error => {
+        if (error) return sendJson(response, 500, { error: 'Certificate generation failed. Repair the Python environment and try again.' });
+        const file = path.join(certificateDirectory, 'RV_Certificate_Flattened.pdf');
+        fs.readFile(file, (readError, data) => {
+          if (readError) return sendJson(response, 500, { error: 'Certificate output was not created.' });
+          response.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="RV_Certificate.pdf"' });
+          response.end(data);
+        });
+      });
+    } catch (error) { return sendJson(response, 400, { error: error.message }); }
+    return;
+  }
+  if (url.pathname === '/certificate-generator.html' && !requireAdmin(request, response)) return;
   if (url.pathname === '/admin.html' && !requireAdmin(request, response)) return;
   if (url.pathname === '/api/content' && request.method === 'PUT') {
     if (!requireAdmin(request, response)) return;
