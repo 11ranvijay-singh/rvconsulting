@@ -116,7 +116,8 @@ http.createServer(async (request, response) => {
       execFile(certificatePython, [path.join(root, 'certificate_generator.py'), '--name', name.trim(), '--date', date, '--format', format], { cwd: root, timeout: 120000 }, (error, stdout, stderr) => {
         if (error) {
           console.error('Certificate generation failed', { executable: certificatePython, error: error.message, stdout, stderr });
-          return sendJson(response, 500, { error: 'Certificate generation failed. Check the Render service logs for details.' });
+          const diagnostic = (stderr || error.message).trim().split(/\r?\n/).filter(Boolean).slice(-3).join(' ').slice(0, 900);
+          return sendJson(response, 500, { error: `Certificate generation failed: ${diagnostic || 'The generator exited unexpectedly.'}` });
         }
         const file = path.join(certificateDirectory, 'RV_Certificate_Flattened.pdf');
         fs.readFile(file, (readError, data) => {
