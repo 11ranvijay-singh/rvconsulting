@@ -2,7 +2,10 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
+const { PDFDocument } = require('pdf-lib');
+const sharp = require('sharp');
+const archiver = require('archiver');
+const { PassThrough } = require('stream');
 
 const root = __dirname;
 const database = path.join(root, 'data', 'content.json');
@@ -11,6 +14,7 @@ const proofDirectory = path.join(root, 'assets', 'testimonial-proofs');
 const offerLetterDirectory = path.join(root, 'assets', 'offer-letter-uploads');
 const maxAdminRequestBytes = 8 * 1024 * 1024;
 const certificateBackground = path.join(root, 'assets', 'certificate-background.png');
+const certificateDateFont = path.join(root, 'assets', 'Merriweather-Italic.ttf');
 const username = process.env.ADMIN_USERNAME || 'admin';
 const password = process.env.ADMIN_PASSWORD || 'ChangeMeNow123!';
 const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8', '.webp': 'image/webp', '.xml': 'application/xml; charset=utf-8' };
@@ -25,23 +29,39 @@ const ordinalDate = (value) => {
   const suffix = day >= 11 && day <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[day % 10] || 'th');
   return `${day}${suffix} ${date.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' }).toUpperCase()} ${date.getUTCFullYear()}`;
 };
+const escapeXml = (value) => String(value).replace(/[<>&'\"]/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[character]);
+const certificateTextLayer = (text, size, weight = 400) => {
+  const font = fs.readFileSync(certificateDateFont).toString('base64');
+  return Buffer.from(`<svg width="1488" height="150" xmlns="http://www.w3.org/2000/svg"><style>@font-face{font-family:Certificate;src:url(data:font/ttf;base64,${font})}text{font-family:Certificate,serif;font-style:italic;font-weight:${weight};fill:#000}</style><text x="744" y="${size + 16}" font-size="${size}" text-anchor="middle">${escapeXml(text)}</text></svg>`);
+};
 const createCertificatePdf = async (name, date) => {
+  const nameSize = Math.max(32, Math.min(82, Math.floor(1200 / Math.max(name.length, 1) / 0.62)));
+  const flattenedImage = await sharp(certificateBackground).composite([
+    { input: certificateTextLayer(name, nameSize, 700), top: 980, left: 0 },
+    { input: certificateTextLayer(ordinalDate(date), 58), top: 1120, left: 0 },
+  ]).png().toBuffer();
   const pdf = await PDFDocument.create();
   const page = pdf.addPage([595.44, 841.68]);
-  const background = await pdf.embedPng(fs.readFileSync(certificateBackground));
-  const nameFont = await pdf.embedFont(StandardFonts.TimesRomanBoldItalic);
-  const dateFont = await pdf.embedFont(StandardFonts.TimesRomanItalic);
+  const background = await pdf.embedPng(flattenedImage);
   const { width, height } = page.getSize();
   page.drawImage(background, { x: 0, y: 0, width, height });
-  const drawCentered = (text, font, preferredSize, maxWidth, topY) => {
-    const size = preferredSize * Math.min(1, maxWidth / font.widthOfTextAtSize(text, preferredSize));
-    const textWidth = font.widthOfTextAtSize(text, size);
-    page.drawText(text, { x: (width - textWidth) / 2, y: height - topY * 0.4 - size, size, font, color: rgb(0, 0, 0) });
-  };
-  drawCentered(name, nameFont, 34, 340, 1007);
-  drawCentered(ordinalDate(date), dateFont, 27, 260, 1142);
   return Buffer.from(await pdf.save());
 };
+const certificateFilename = (name) => `RV_Certificate_${name.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '').slice(0, 70) || 'recipient'}.pdf`;
+const validCertificate = ({ name, date }) => typeof name === 'string' && name.trim() && name.length <= 80 && /^\d{4}-\d{2}-\d{2}$/.test(date || '');
+const createCertificateZip = async (entries) => new Promise((resolve, reject) => {
+  const output = new PassThrough(); const chunks = [];
+  output.on('data', (chunk) => chunks.push(chunk)); output.on('end', () => resolve(Buffer.concat(chunks))); output.on('error', reject);
+  const zip = archiver('zip', { zlib: { level: 9 } }); zip.on('error', reject); zip.pipe(output);
+  (async () => {
+    try {
+      for (const [index, entry] of entries.entries()) {
+        zip.append(await createCertificatePdf(entry.name.trim(), entry.date), { name: `${String(index + 1).padStart(3, '0')}_${certificateFilename(entry.name)}` });
+      }
+      zip.finalize();
+    } catch (error) { reject(error); }
+  })();
+});
 const readContent = () => JSON.parse(fs.readFileSync(database, 'utf8'));
 const writeContent = (content) => fs.writeFileSync(database, `${JSON.stringify(content, null, 2)}\n`);
 const readAnalytics = () => {
@@ -131,13 +151,25 @@ http.createServer(async (request, response) => {
     if (!requireAdmin(request, response)) return;
     try {
       const { name, date } = await readBody(request);
-      const format = 'pdf';
       if (typeof name !== 'string' || !name.trim() || name.length > 80) return sendJson(response, 400, { error: 'A recipient name of up to 80 characters is required.' });
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return sendJson(response, 400, { error: 'Provide a valid certificate date.' });
       const pdf = await createCertificatePdf(name.trim(), date);
       response.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="RV_Certificate.pdf"' });
       response.end(pdf);
     } catch (error) { return sendJson(response, 400, { error: error.message }); }
+    return;
+  }
+  if (url.pathname === '/api/certificates/bulk' && request.method === 'POST') {
+    if (!requireAdmin(request, response)) return;
+    try {
+      const { entries } = await readBody(request);
+      if (!Array.isArray(entries) || !entries.length) return sendJson(response, 400, { error: 'Add at least one certificate recipient.' });
+      if (entries.length > 100) return sendJson(response, 400, { error: 'Generate up to 100 certificates at a time.' });
+      if (!entries.every(validCertificate)) return sendJson(response, 400, { error: 'Each row needs a name (up to 80 characters) and a date in YYYY-MM-DD format.' });
+      const zip = await createCertificateZip(entries);
+      response.writeHead(200, { 'Content-Type': 'application/zip', 'Content-Disposition': 'attachment; filename="RV_Certificates.zip"' });
+      response.end(zip);
+    } catch (error) { return sendJson(response, 400, { error: error.message || 'Unable to generate certificates.' }); }
     return;
   }
   if (url.pathname === '/certificate-generator.html' && !requireAdmin(request, response)) return;

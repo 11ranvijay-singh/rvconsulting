@@ -38,12 +38,45 @@ const generateCertificate = async () => {
   try {
     const response = await fetch('/api/certificates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, date }) });
     if (!response.ok) { const result = await response.json().catch(() => ({})); throw new Error(result.error || 'Certificate generation failed.'); }
-    const blob = await response.blob(); const url = URL.createObjectURL(blob); const link = document.createElement('a');
-    link.href = url; link.download = `RV_Certificate_${name.replace(/[^a-z0-9]+/gi, '_')}.pdf`; link.click(); URL.revokeObjectURL(url);
+    downloadBlob(await response.blob(), `RV_Certificate_${name.replace(/[^a-z0-9]+/gi, '_')}.pdf`);
     status('PDF certificate generated.');
   } catch (error) { status(error.message || 'Certificate generation failed.', true); }
   finally { button.disabled = false; button.classList.remove('is-loading'); button.textContent = 'Generate PDF certificate'; }
 };
+const downloadBlob = (blob, filename) => { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = filename; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
+const parseCertificateCsv = (text) => {
+  const rows = []; let row = []; let value = ''; let quoted = false;
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index]; const next = text[index + 1];
+    if (character === '"' && quoted && next === '"') { value += '"'; index += 1; } else if (character === '"') quoted = !quoted;
+    else if (character === ',' && !quoted) { row.push(value); value = ''; }
+    else if ((character === '\n' || character === '\r') && !quoted) { if (character === '\r' && next === '\n') index += 1; row.push(value); if (row.some((cell) => cell.trim())) rows.push(row); row = []; value = ''; }
+    else value += character;
+  }
+  row.push(value); if (row.some((cell) => cell.trim())) rows.push(row);
+  if (!rows.length) throw new Error('The CSV file is empty.');
+  const headers = rows.shift().map((header) => header.trim().toLowerCase()); const nameColumn = headers.indexOf('name'); const dateColumn = headers.indexOf('date');
+  if (nameColumn < 0 || dateColumn < 0) throw new Error('The first CSV row must contain name,date.');
+  const entries = rows.map((cells, index) => ({ name: (cells[nameColumn] || '').trim(), date: (cells[dateColumn] || '').trim(), row: index + 2 }));
+  const invalid = entries.find((entry) => !entry.name || entry.name.length > 80 || !/^\d{4}-\d{2}-\d{2}$/.test(entry.date));
+  if (invalid) throw new Error(`Check CSV row ${invalid.row}: add a name and a date in YYYY-MM-DD format.`);
+  return entries;
+};
+const generateBulkCertificates = async () => {
+  const file = byId('certificate-bulk-file').files[0]; const button = byId('generate-bulk-certificates');
+  if (!file) return status('Choose a CSV file first.', true);
+  try {
+    const entries = parseCertificateCsv(await file.text());
+    if (!entries.length) throw new Error('Add at least one certificate recipient.');
+    if (entries.length > 100) throw new Error('Generate up to 100 certificates at a time.');
+    button.disabled = true; button.classList.add('is-loading'); button.textContent = 'Generating ZIP file'; status(`Generating ${entries.length} PDF certificate${entries.length === 1 ? '' : 's'}...`);
+    const response = await fetch('/api/certificates/bulk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entries }) });
+    if (!response.ok) { const result = await response.json().catch(() => ({})); throw new Error(result.error || 'Certificate generation failed.'); }
+    downloadBlob(await response.blob(), 'RV_Certificates.zip'); status(`${entries.length} PDF certificate${entries.length === 1 ? '' : 's'} generated in a ZIP file.`);
+  } catch (error) { status(error.message || 'Certificate generation failed.', true); }
+  finally { button.disabled = false; button.classList.remove('is-loading'); button.textContent = 'Generate ZIP of PDF certificates'; }
+};
+const setCertificateMode = (mode) => { const isSingle = mode === 'single'; byId('single-certificate-form').hidden = !isSingle; byId('bulk-certificate-form').hidden = isSingle; document.querySelectorAll('[data-certificate-mode]').forEach((button) => { const active = button.dataset.certificateMode === mode; button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); }); status(''); };
 const showSelectedCertificateDate = () => {
   const value = byId('certificate-date').value;
   byId('certificate-date-display').textContent = value ? `Selected certificate date: ${new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${value}T12:00:00`))}` : 'No certificate date selected.';
@@ -53,7 +86,7 @@ document.addEventListener('input', (event) => { const article = event.target.clo
 document.addEventListener('change', (event) => { const article = event.target.closest('article'); const file = event.target.files?.[0]; const key = event.target.dataset.key; if (!article || !file || !['proofUpload', 'offerLetterUpload'].includes(key)) return; const allowedType = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || /\.(png|jpe?g|webp)$/i.test(file.name); if (!allowedType) { status('Unsupported image type. Please upload only PNG, JPG, or WebP images.', true); event.target.value = ''; return; } if (file.size > 5 * 1024 * 1024) { status('Image is too large. The maximum allowed size is 5 MB.', true); event.target.value = ''; return; } const reader = new FileReader(); reader.onload = () => { const item = content[article.dataset.type][article.dataset.index]; if (key === 'proofUpload') item.proofImageData = reader.result; else item.imageData = reader.result; status('Image ready. Click the save button for this section.'); }; reader.readAsDataURL(file); });
 byId('analytics-period').addEventListener('change', renderAnalytics);
 byId('certificate-date').addEventListener('change', showSelectedCertificateDate);
-document.addEventListener('click', (event) => { const panelLink = event.target.closest('.menu-link'); if (panelLink) return showPanel(panelLink.dataset.panelTarget); if (event.target.closest('#refresh-analytics')) return loadAnalytics(); if (event.target.closest('#generate-certificate')) return generateCertificate(); const saveButton = event.target.closest('[data-save-section]'); if (saveButton) return saveSection(saveButton.dataset.saveSection); const article = event.target.closest('article'); if (event.target.classList.contains('remove') && article) { content[article.dataset.type].splice(article.dataset.index, 1); render(); } });
+document.addEventListener('click', (event) => { const panelLink = event.target.closest('.menu-link'); if (panelLink) return showPanel(panelLink.dataset.panelTarget); const modeButton = event.target.closest('[data-certificate-mode]'); if (modeButton) return setCertificateMode(modeButton.dataset.certificateMode); if (event.target.closest('#refresh-analytics')) return loadAnalytics(); if (event.target.closest('#generate-certificate')) return generateCertificate(); if (event.target.closest('#generate-bulk-certificates')) return generateBulkCertificates(); const saveButton = event.target.closest('[data-save-section]'); if (saveButton) return saveSection(saveButton.dataset.saveSection); const article = event.target.closest('article'); if (event.target.classList.contains('remove') && article) { content[article.dataset.type].splice(article.dataset.index, 1); render(); } });
 byId('add-course').onclick = () => { content.courses.push({ title: 'New course', duration: '', oldPrice: '', price: '', note: '', featured: false, visible: true }); render(); };
 byId('add-faq').onclick = () => { content.faqs.push({ question: 'New question', answer: '', visible: true }); render(); };
 byId('add-testimonial').onclick = () => { content.testimonials.push({ quote: '', name: '', role: '', visible: true }); render(); };
