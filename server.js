@@ -17,7 +17,7 @@ const certificateBackground = path.join(root, 'assets', 'certificate-background.
 const certificateDateFont = path.join(root, 'assets', 'Merriweather-Italic.ttf');
 const username = process.env.ADMIN_USERNAME || 'admin';
 const password = process.env.ADMIN_PASSWORD || 'ChangeMeNow123!';
-const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8', '.webp': 'image/webp', '.xml': 'application/xml; charset=utf-8' };
+const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.mp4': 'video/mp4', '.png': 'image/png', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8', '.webp': 'image/webp', '.xml': 'application/xml; charset=utf-8' };
 
 const sendJson = (response, status, body) => {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -194,6 +194,24 @@ http.createServer(async (request, response) => {
   if (pathname === '/server.js' || pathname.startsWith('/data/') || pathname.startsWith('/.github-cli')) return response.writeHead(404).end('Not found');
   const file = path.resolve(root, `.${decodeURIComponent(pathname)}`);
   if (!file.startsWith(`${root}${path.sep}`)) return response.writeHead(403).end('Forbidden');
+  if (path.extname(file).toLowerCase() === '.mp4') {
+    return fs.stat(file, (error, stats) => {
+      if (error || !stats.isFile()) return response.writeHead(error?.code === 'ENOENT' ? 404 : 500).end('Not found');
+      const range = request.headers.range;
+      if (!range) {
+        response.writeHead(200, { 'Accept-Ranges': 'bytes', 'Content-Length': stats.size, 'Content-Type': 'video/mp4' });
+        return fs.createReadStream(file).pipe(response);
+      }
+      const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+      const start = match?.[1] ? Number(match[1]) : 0;
+      const end = match?.[2] ? Math.min(Number(match[2]), stats.size - 1) : stats.size - 1;
+      if (!match || !Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start > end || start >= stats.size) {
+        return response.writeHead(416, { 'Content-Range': `bytes */${stats.size}` }).end();
+      }
+      response.writeHead(206, { 'Accept-Ranges': 'bytes', 'Content-Length': end - start + 1, 'Content-Range': `bytes ${start}-${end}/${stats.size}`, 'Content-Type': 'video/mp4' });
+      return fs.createReadStream(file, { start, end }).pipe(response);
+    });
+  }
   fs.readFile(file, (error, data) => {
     if (error) return response.writeHead(error.code === 'ENOENT' ? 404 : 500).end('Not found');
     response.writeHead(200, { 'Content-Type': types[path.extname(file).toLowerCase()] || 'application/octet-stream' });
