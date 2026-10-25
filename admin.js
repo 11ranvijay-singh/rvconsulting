@@ -1,7 +1,7 @@
 let content = { courses: [], testimonials: [], faqs: [], offerLetters: [], videoTestimonies: [], studyMaterials: [], demoClass: {} };
 let analyticsData = null;
 let generatedCertificate = null;
-const certificateMarketingMessage = 'Discover practical AML, KYC, fraud and crypto investigation training with RV Consulting. Explore courses, learner outcomes and career guidance: https://rv-consulting.in/';
+const certificateMarketingMessage = 'Congratulations, you have achieved it! Here is your certificate. Discover practical AML, KYC, fraud and crypto investigation training with RV Consulting. Explore courses, learner outcomes and career guidance: https://rv-consulting.in/';
 const byId = (id) => document.querySelector(`#${id}`);
 const setCertificateActionsState = (enabled) => {
   const actions = byId('certificate-actions');
