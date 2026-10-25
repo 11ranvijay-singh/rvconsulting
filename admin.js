@@ -1,5 +1,6 @@
-let content = { courses: [], testimonials: [], faqs: [], offerLetters: [], studyMaterials: [], demoClass: {} };
+let content = { courses: [], testimonials: [], faqs: [], offerLetters: [], videoTestimonies: [], studyMaterials: [], demoClass: {} };
 let analyticsData = null;
+let generatedCertificate = null;
 const byId = (id) => document.querySelector(`#${id}`);
 const escape = (value = '') => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character]);
 const field = (label, key, value, wide = false) => `<label class="${wide ? 'wide' : ''}">${label}<input data-key="${key}" value="${escape(value)}"></label>`;
@@ -23,10 +24,11 @@ const render = () => {
   const demo = content.demoClass || {};
   byId('demo-class').innerHTML = `<article data-type="demoClass"><div class="grid">${field('Demo-class title', 'title', demo.title, true)}${textareaField('Description', 'description', demo.description)}${textareaField('Contact message', 'contactMessage', demo.contactMessage)}${field('WhatsApp or meeting link', 'meetingLink', demo.meetingLink, true)}${field('Button label', 'buttonLabel', demo.buttonLabel)}<label class="toggle-label">Show on website<input data-key="visible" type="checkbox" ${demo.visible !== false ? 'checked' : ''}></label></div></article>`;
   byId('offer-letters').innerHTML = content.offerLetters.map((item, index) => `<article data-index="${index}" data-type="offerLetters"><div class="grid"><label class="toggle-label">Show on website<input data-key="visible" type="checkbox" ${item.visible !== false ? 'checked' : ''}></label><label class="wide">Offer-letter image (PNG, JPG or WebP, max 5 MB)<input data-key="offerLetterUpload" type="file" accept="image/png,image/jpeg,image/webp">${item.image ? `<a class="proof-link" href="/${escape(item.image)}" target="_blank" rel="noopener">View uploaded offer letter</a>` : ''}</label></div><button class="remove" type="button">Remove offer letter</button></article>`).join('');
+  byId('video-testimonies').innerHTML = content.videoTestimonies.map((item, index) => `<article data-index="${index}" data-type="videoTestimonies"><div class="grid"><label class="toggle-label">Show on website<input data-key="visible" type="checkbox" ${item.visible !== false ? 'checked' : ''}></label><label class="wide">Video file${item.video ? `<a class="proof-link" href="/${escape(item.video)}" target="_blank" rel="noopener">Preview uploaded video</a>` : ''}</label></div><button class="remove" type="button">Remove video testimony</button></article>`).join('');
 };
 
 const showPanel = (name) => { document.querySelectorAll('.admin-panel').forEach((panel) => { panel.hidden = panel.dataset.panel !== name; }); document.querySelectorAll('.menu-link').forEach((link) => link.classList.toggle('active', link.dataset.panelTarget === name)); if (name === 'analytics') loadAnalytics(); status(''); };
-const ensureArrays = () => { content.courses ||= []; content.testimonials ||= []; content.faqs ||= []; content.offerLetters ||= []; content.studyMaterials ||= []; content.demoClass ||= {}; };
+const ensureArrays = () => { content.courses ||= []; content.testimonials ||= []; content.faqs ||= []; content.offerLetters ||= []; content.videoTestimonies ||= []; content.studyMaterials ||= []; content.demoClass ||= {}; };
 const saveSection = async (name) => { status(`Saving ${name}...`); try { const response = await fetch('/api/content', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(content) }); if (!response.ok) { const result = await response.json().catch(() => ({})); throw new Error(result.error || 'Unable to save changes.'); } content = await response.json(); ensureArrays(); render(); status(`${name.charAt(0).toUpperCase() + name.slice(1)} saved. Your website is updated.`); } catch (error) { status(error.message || 'Unable to save changes. Please check your connection and try again.', true); } };
 const generateCertificate = async () => {
   const name = byId('certificate-name').value.trim();
@@ -38,12 +40,25 @@ const generateCertificate = async () => {
   try {
     const response = await fetch('/api/certificates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, date }) });
     if (!response.ok) { const result = await response.json().catch(() => ({})); throw new Error(result.error || 'Certificate generation failed.'); }
-    downloadBlob(await response.blob(), `RV_Certificate_${name.replace(/[^a-z0-9]+/gi, '_')}.pdf`);
-    status('PDF certificate generated.');
+    const filename = `RV_Certificate_${name.replace(/[^a-z0-9]+/gi, '_')}.pdf`;
+    generatedCertificate = { blob: await response.blob(), filename };
+    byId('certificate-actions').hidden = false;
+    status('PDF certificate generated. Choose an action below.');
   } catch (error) { status(error.message || 'Certificate generation failed.', true); }
   finally { button.disabled = false; button.classList.remove('is-loading'); button.textContent = 'Generate PDF certificate'; }
 };
 const downloadBlob = (blob, filename) => { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = filename; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
+const downloadGeneratedCertificate = () => { if (!generatedCertificate) return status('Generate a certificate first.', true); downloadBlob(generatedCertificate.blob, generatedCertificate.filename); status('Certificate download started.'); };
+const shareGeneratedCertificate = async () => {
+  if (!generatedCertificate) return status('Generate a certificate first.', true);
+  const file = new File([generatedCertificate.blob], generatedCertificate.filename, { type: 'application/pdf' });
+  if (!navigator.share || (navigator.canShare && !navigator.canShare({ files: [file] }))) return downloadGeneratedCertificate();
+  try { await navigator.share({ title: 'RV Consulting certificate', text: 'Certificate from RV Consulting', files: [file] }); status('Certificate shared.'); } catch (error) { if (error.name !== 'AbortError') status('Unable to share the certificate file. Download it instead.', true); }
+};
+const shareCertificateOnWhatsApp = () => {
+  const message = '🎓 Discover practical AML, KYC, fraud and crypto investigation training with RV Consulting. Explore courses, learner outcomes and career guidance: https://rv-consulting.in/';
+  window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+};
 const parseCertificateCsv = (text) => {
   const rows = []; let row = []; let value = ''; let quoted = false;
   for (let index = 0; index < text.length; index += 1) {
@@ -81,16 +96,41 @@ const showSelectedCertificateDate = () => {
   const value = byId('certificate-date').value;
   byId('certificate-date-display').textContent = value ? `Selected certificate date: ${new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${value}T12:00:00`))}` : 'No certificate date selected.';
 };
+const uploadFiles = async (files, type) => {
+  const selected = Array.from(files || []);
+  if (!selected.length) return;
+  const isVideo = type === 'videoTestimonies';
+  const allowed = isVideo ? (file) => file.type === 'video/mp4' || /\.mp4$/i.test(file.name) : (file) => ['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || /\.(png|jpe?g|webp)$/i.test(file.name);
+  const maxBytes = isVideo ? 100 * 1024 * 1024 : 5 * 1024 * 1024;
+  const invalid = selected.find((file) => !allowed(file) || file.size > maxBytes);
+  if (invalid) return status(isVideo ? 'Choose MP4 videos up to 100 MB each.' : 'Choose PNG, JPG, or WebP images up to 5 MB each.', true);
+  const endpoint = isVideo ? '/api/media/video' : '/api/media/offer-letter';
+  const label = isVideo ? 'video testimony' : 'offer letter';
+  try {
+    for (const [index, file] of selected.entries()) {
+      status(`Uploading ${label} ${index + 1} of ${selected.length}...`);
+      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': file.type || (isVideo ? 'video/mp4' : 'image/jpeg'), 'X-File-Name': file.name }, body: file });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || `Unable to upload ${file.name}.`);
+      const pathKey = isVideo ? 'video' : 'image';
+      if (!content[type].some((item) => item[pathKey] === result.path)) content[type].unshift({ [pathKey]: result.path, visible: true });
+    }
+    await saveSection(type);
+    status(`${selected.length} ${label}${selected.length === 1 ? '' : 's'} uploaded and published.`);
+  } catch (error) { status(error.message || 'Upload failed. Please try again.', true); }
+};
 
 document.addEventListener('input', (event) => { const article = event.target.closest('article'); if (!article || !event.target.dataset.key || event.target.type === 'file') return; const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value; if (article.dataset.type === 'demoClass') content.demoClass[event.target.dataset.key] = value; else content[article.dataset.type][article.dataset.index][event.target.dataset.key] = value; });
 document.addEventListener('change', (event) => { const article = event.target.closest('article'); const file = event.target.files?.[0]; const key = event.target.dataset.key; if (!article || !file || !['proofUpload', 'offerLetterUpload'].includes(key)) return; const allowedType = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || /\.(png|jpe?g|webp)$/i.test(file.name); if (!allowedType) { status('Unsupported image type. Please upload only PNG, JPG, or WebP images.', true); event.target.value = ''; return; } if (file.size > 5 * 1024 * 1024) { status('Image is too large. The maximum allowed size is 5 MB.', true); event.target.value = ''; return; } const reader = new FileReader(); reader.onload = () => { const item = content[article.dataset.type][article.dataset.index]; if (key === 'proofUpload') item.proofImageData = reader.result; else item.imageData = reader.result; status('Image ready. Click the save button for this section.'); }; reader.readAsDataURL(file); });
 byId('analytics-period').addEventListener('change', renderAnalytics);
 byId('certificate-date').addEventListener('change', showSelectedCertificateDate);
-document.addEventListener('click', (event) => { const panelLink = event.target.closest('.menu-link'); if (panelLink) return showPanel(panelLink.dataset.panelTarget); const modeButton = event.target.closest('[data-certificate-mode]'); if (modeButton) return setCertificateMode(modeButton.dataset.certificateMode); if (event.target.closest('#refresh-analytics')) return loadAnalytics(); if (event.target.closest('#generate-certificate')) return generateCertificate(); if (event.target.closest('#generate-bulk-certificates')) return generateBulkCertificates(); const saveButton = event.target.closest('[data-save-section]'); if (saveButton) return saveSection(saveButton.dataset.saveSection); const article = event.target.closest('article'); if (event.target.classList.contains('remove') && article) { content[article.dataset.type].splice(article.dataset.index, 1); render(); } });
+byId('bulk-offer-letter-upload').addEventListener('change', (event) => { uploadFiles(event.target.files, 'offerLetters').finally(() => { event.target.value = ''; }); });
+byId('bulk-video-testimony-upload').addEventListener('change', (event) => { uploadFiles(event.target.files, 'videoTestimonies').finally(() => { event.target.value = ''; }); });
+document.addEventListener('click', (event) => { const panelLink = event.target.closest('.menu-link'); if (panelLink) return showPanel(panelLink.dataset.panelTarget); const modeButton = event.target.closest('[data-certificate-mode]'); if (modeButton) return setCertificateMode(modeButton.dataset.certificateMode); if (event.target.closest('#refresh-analytics')) return loadAnalytics(); if (event.target.closest('#generate-certificate')) return generateCertificate(); if (event.target.closest('#download-certificate')) return downloadGeneratedCertificate(); if (event.target.closest('#share-certificate-file')) return shareGeneratedCertificate(); if (event.target.closest('#share-certificate-whatsapp')) return shareCertificateOnWhatsApp(); if (event.target.closest('#generate-bulk-certificates')) return generateBulkCertificates(); const saveButton = event.target.closest('[data-save-section]'); if (saveButton) return saveSection(saveButton.dataset.saveSection); const article = event.target.closest('article'); if (event.target.classList.contains('remove') && article) { content[article.dataset.type].splice(article.dataset.index, 1); render(); } });
 byId('add-course').onclick = () => { content.courses.push({ title: 'New course', duration: '', oldPrice: '', price: '', note: '', featured: false, visible: true }); render(); };
 byId('add-faq').onclick = () => { content.faqs.push({ question: 'New question', answer: '', visible: true }); render(); };
 byId('add-testimonial').onclick = () => { content.testimonials.push({ quote: '', name: '', role: '', visible: true }); render(); };
 byId('add-study-material').onclick = () => { content.studyMaterials.push({ title: 'New study material', institution: 'RV Consulting Institute', edition: '', subtitle: '', description: '', oldPrice: '', price: '', note: 'Study-material access', whatsappMessage: 'Hi RV Consulting, I want to get access to the study material notes.', visible: true }); render(); };
-byId('add-offer-letter').onclick = () => { content.offerLetters.push({ visible: true }); render(); };
+byId('add-offer-letter')?.addEventListener('click', () => { content.offerLetters.push({ visible: true }); render(); });
 byId('content-form').addEventListener('submit', (event) => event.preventDefault());
 fetch('/api/content').then((response) => { if (!response.ok) throw new Error(); return response.json(); }).then((data) => { content = { ...content, ...data }; ensureArrays(); render(); }).catch(() => status('Unable to load content.', true));

@@ -12,6 +12,7 @@ const database = path.join(root, 'data', 'content.json');
 const analyticsDatabase = path.join(root, 'data', 'analytics.json');
 const proofDirectory = path.join(root, 'assets', 'testimonial-proofs');
 const offerLetterDirectory = path.join(root, 'assets', 'offer-letter-uploads');
+const videoTestimonyDirectory = path.join(root, 'assets', 'video-testimony-uploads');
 const maxAdminRequestBytes = 8 * 1024 * 1024;
 const certificateBackground = path.join(root, 'assets', 'certificate-background.png');
 const certificateDateFont = path.join(root, 'assets', 'Merriweather-Italic.ttf');
@@ -113,6 +114,33 @@ const readBody = (request) => new Promise((resolve, reject) => {
     try { resolve(JSON.parse(body || '{}')); } catch { reject(new Error('Invalid request data. Please try again.')); }
   });
 });
+const readRawBody = (request, maxBytes) => new Promise((resolve, reject) => {
+  const chunks = []; let size = 0;
+  request.on('data', (chunk) => { size += chunk.length; if (size <= maxBytes) chunks.push(chunk); });
+  request.on('end', () => size > maxBytes ? reject(new Error('File is too large.')) : resolve(Buffer.concat(chunks)));
+  request.on('error', reject);
+});
+const uploadMedia = async (request, response, kind) => {
+  const isVideo = kind === 'video';
+  const maxBytes = isVideo ? 100 * 1024 * 1024 : 5 * 1024 * 1024;
+  const contentType = String(request.headers['content-type'] || '').split(';')[0].toLowerCase();
+  const filename = String(request.headers['x-file-name'] || '');
+  const extension = path.extname(filename).toLowerCase();
+  const allowed = isVideo ? (contentType === 'video/mp4' || extension === '.mp4') : (['image/jpeg', 'image/png', 'image/webp'].includes(contentType) || ['.jpg', '.jpeg', '.png', '.webp'].includes(extension));
+  if (!allowed) return sendJson(response, 400, { error: isVideo ? 'Upload an MP4 video.' : 'Upload a PNG, JPG, or WebP image.' });
+  try {
+    const file = await readRawBody(request, maxBytes);
+    if (!file.length) return sendJson(response, 400, { error: 'Choose a file to upload.' });
+    const safeExtension = isVideo ? '.mp4' : ({ '.jpg': '.jpg', '.jpeg': '.jpg', '.png': '.png', '.webp': '.webp' }[extension] || (contentType === 'image/png' ? '.png' : contentType === 'image/webp' ? '.webp' : '.jpg'));
+    const directory = isVideo ? videoTestimonyDirectory : offerLetterDirectory;
+    const publicDirectory = isVideo ? 'assets/video-testimony-uploads' : 'assets/offer-letter-uploads';
+    const storedName = `${crypto.createHash('sha256').update(file).digest('hex')}${safeExtension}`;
+    fs.mkdirSync(directory, { recursive: true });
+    const target = path.join(directory, storedName);
+    if (!fs.existsSync(target)) fs.writeFileSync(target, file);
+    return sendJson(response, 201, { path: `${publicDirectory}/${storedName}` });
+  } catch (error) { return sendJson(response, 400, { error: error.message || 'Upload failed.' }); }
+};
 const saveProofImage = (testimonial) => {
   if (!testimonial.proofImageData?.startsWith('data:image/')) return testimonial;
   const match = testimonial.proofImageData.match(/^data:image\/(png|jpeg|webp);base64,(.+)$/);
@@ -147,6 +175,14 @@ http.createServer(async (request, response) => {
     if (!requireAdmin(request, response)) return;
     return sendJson(response, 200, analyticsSummary());
   }
+  if (url.pathname === '/api/media/video' && request.method === 'POST') {
+    if (!requireAdmin(request, response)) return;
+    return uploadMedia(request, response, 'video');
+  }
+  if (url.pathname === '/api/media/offer-letter' && request.method === 'POST') {
+    if (!requireAdmin(request, response)) return;
+    return uploadMedia(request, response, 'offer-letter');
+  }
   if (url.pathname === '/api/certificates' && request.method === 'POST') {
     if (!requireAdmin(request, response)) return;
     try {
@@ -180,6 +216,7 @@ http.createServer(async (request, response) => {
       const content = await readBody(request);
       if (!Array.isArray(content.courses) || !Array.isArray(content.testimonials)) return sendJson(response, 400, { error: 'Courses and testimonials are required.' });
       if (!Array.isArray(content.offerLetters)) content.offerLetters = [];
+      if (!Array.isArray(content.videoTestimonies)) content.videoTestimonies = [];
       if (!Array.isArray(content.studyMaterials)) content.studyMaterials = [];
       if (!Array.isArray(content.faqs)) content.faqs = [];
       if (!content.demoClass || typeof content.demoClass !== 'object' || Array.isArray(content.demoClass)) content.demoClass = {};

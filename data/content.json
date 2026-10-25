@@ -19,6 +19,13 @@
     { "image": "assets/offer-letters/offer-letter-107.jpeg", "visible": true },
     { "image": "assets/offer-letters/offer-letter-108.jpeg", "visible": true }
   ],
+  "videoTestimonies": [
+    { "video": "assets/video-testimonials/video-testimony-01.mp4", "visible": true },
+    { "video": "assets/video-testimonials/video-testimony-02.mp4", "visible": true },
+    { "video": "assets/video-testimonials/video-testimony-03.mp4", "visible": true },
+    { "video": "assets/video-testimonials/video-testimony-04.mp4", "visible": true },
+    { "video": "assets/video-testimonials/video-testimony-05.mp4", "visible": true }
+  ],
   "faqs": [
     { "question": "Who can join these programmes?", "answer": "The programmes are suitable for freshers, experienced professionals, students and anyone interested in building a career in this field. Candidates with BPO, voice or chat-support experience can also apply. After completing the course, they can explore better career opportunities and may be able to seek a significant hike over their previous salary.", "visible": true },
     { "question": "Do I need previous AML or KYC experience?", "answer": "No. The learning path starts with essential concepts and moves into practical review and investigation exercises.", "visible": true },

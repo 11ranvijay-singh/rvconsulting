@@ -198,6 +198,11 @@ async function loadManagedContent() {
       const allOfferLetters = [...managedOfferLetters.map((item) => item.image), ...staticOfferLetters].slice(0, 6);
       offerPreview.innerHTML = allOfferLetters.map((image, index) => `<a href="${html(image)}" target="_blank" rel="noopener"><img src="${html(image)}" alt="Learner offer letter proof ${index + 1}" loading="lazy"><span>View offer letter</span></a>`).join('');
     }
+    const videoPreview = document.querySelector('.video-testimonial-preview');
+    const managedVideos = content.videoTestimonies?.filter((item) => item.visible !== false && item.video) || [];
+    if (videoPreview && managedVideos.length) {
+      videoPreview.innerHTML = managedVideos.slice(0, 3).map((item, index) => `<a class="video-testimonial-card" href="video-testimonials.html#video-testimony-${index + 1}"><video src="${html(item.video)}" poster="assets/video-testimonials/candidate-video-testimony-thumbnail.png" preload="none" muted playsinline aria-hidden="true"></video><span class="video-testimonial-play">▶</span><span>Watch video testimony</span></a>`).join('');
+    }
   } catch (_) { /* The static preview remains usable when the admin API is unavailable. */ }
 }
 loadManagedContent().finally(dismissLoader);
