@@ -3,7 +3,22 @@
     { "id": "aml-crypto", "title": "AML / KYC / Fraud Investigation / Crypto", "duration": "4-month programme", "oldPrice": "INR 60,000", "price": "INR 40,000", "note": "Programme fee", "featured": true },
     { "id": "aml-fraud", "title": "AML / KYC & Fraud Investigation", "duration": "3-month programme", "oldPrice": "INR 50,000", "price": "INR 36,000", "note": "Course fee", "featured": false }
   ],
-  "offerLetters": [],
+  "offerLetters": [
+    { "image": "assets/offer-letters/offer-letter-095.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-096.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-097.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-098.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-099.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-100.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-101.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-102.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-103.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-104.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-105.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-106.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-107.jpeg", "visible": true },
+    { "image": "assets/offer-letters/offer-letter-108.jpeg", "visible": true }
+  ],
   "faqs": [
     { "question": "Who can join these programmes?", "answer": "The programmes are suitable for freshers, experienced professionals, students and anyone interested in building a career in this field. Candidates with BPO, voice or chat-support experience can also apply. After completing the course, they can explore better career opportunities and may be able to seek a significant hike over their previous salary.", "visible": true },
     { "question": "Do I need previous AML or KYC experience?", "answer": "No. The learning path starts with essential concepts and moves into practical review and investigation exercises.", "visible": true },
