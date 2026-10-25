@@ -1,7 +1,16 @@
 let content = { courses: [], testimonials: [], faqs: [], offerLetters: [], videoTestimonies: [], studyMaterials: [], demoClass: {} };
 let analyticsData = null;
 let generatedCertificate = null;
+const certificateMarketingMessage = 'Discover practical AML, KYC, fraud and crypto investigation training with RV Consulting. Explore courses, learner outcomes and career guidance: https://rv-consulting.in/';
 const byId = (id) => document.querySelector(`#${id}`);
+const setCertificateActionsState = (enabled) => {
+  const actions = byId('certificate-actions');
+  actions.hidden = false;
+  byId('share-certificate-file').textContent = 'Share PDF + marketing message';
+  byId('share-certificate-whatsapp').textContent = 'Share PDF on WhatsApp';
+  actions.querySelector('small').textContent = 'Both share options include the certificate PDF and the RV Consulting marketing message with the website link. For WhatsApp, choose WhatsApp from your device’s share menu.';
+  actions.querySelectorAll('button').forEach((button) => { button.disabled = !enabled; });
+};
 const escape = (value = '') => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character]);
 const field = (label, key, value, wide = false) => `<label class="${wide ? 'wide' : ''}">${label}<input data-key="${key}" value="${escape(value)}"></label>`;
 const textareaField = (label, key, value, wide = true) => `<label class="${wide ? 'wide' : ''}">${label}<textarea data-key="${key}">${escape(value)}</textarea></label>`;
@@ -42,7 +51,7 @@ const generateCertificate = async () => {
     if (!response.ok) { const result = await response.json().catch(() => ({})); throw new Error(result.error || 'Certificate generation failed.'); }
     const filename = `RV_Certificate_${name.replace(/[^a-z0-9]+/gi, '_')}.pdf`;
     generatedCertificate = { blob: await response.blob(), filename };
-    byId('certificate-actions').hidden = false;
+    setCertificateActionsState(true);
     status('PDF certificate generated. Choose an action below.');
   } catch (error) { status(error.message || 'Certificate generation failed.', true); }
   finally { button.disabled = false; button.classList.remove('is-loading'); button.textContent = 'Generate PDF certificate'; }
@@ -53,11 +62,11 @@ const shareGeneratedCertificate = async () => {
   if (!generatedCertificate) return status('Generate a certificate first.', true);
   const file = new File([generatedCertificate.blob], generatedCertificate.filename, { type: 'application/pdf' });
   if (!navigator.share || (navigator.canShare && !navigator.canShare({ files: [file] }))) return downloadGeneratedCertificate();
-  try { await navigator.share({ title: 'RV Consulting certificate', text: 'Certificate from RV Consulting', files: [file] }); status('Certificate shared.'); } catch (error) { if (error.name !== 'AbortError') status('Unable to share the certificate file. Download it instead.', true); }
+  try { await navigator.share({ title: 'RV Consulting certificate', text: certificateMarketingMessage, files: [file] }); status('Certificate shared with the marketing message.'); } catch (error) { if (error.name !== 'AbortError') status('Unable to share the certificate file. Download it instead.', true); }
 };
 const shareCertificateOnWhatsApp = () => {
   const message = '🎓 Discover practical AML, KYC, fraud and crypto investigation training with RV Consulting. Explore courses, learner outcomes and career guidance: https://rv-consulting.in/';
-  window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+  return shareGeneratedCertificate();
 };
 const parseCertificateCsv = (text) => {
   const rows = []; let row = []; let value = ''; let quoted = false;
@@ -124,6 +133,9 @@ document.addEventListener('input', (event) => { const article = event.target.clo
 document.addEventListener('change', (event) => { const article = event.target.closest('article'); const file = event.target.files?.[0]; const key = event.target.dataset.key; if (!article || !file || !['proofUpload', 'offerLetterUpload'].includes(key)) return; const allowedType = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || /\.(png|jpe?g|webp)$/i.test(file.name); if (!allowedType) { status('Unsupported image type. Please upload only PNG, JPG, or WebP images.', true); event.target.value = ''; return; } if (file.size > 5 * 1024 * 1024) { status('Image is too large. The maximum allowed size is 5 MB.', true); event.target.value = ''; return; } const reader = new FileReader(); reader.onload = () => { const item = content[article.dataset.type][article.dataset.index]; if (key === 'proofUpload') item.proofImageData = reader.result; else item.imageData = reader.result; status('Image ready. Click the save button for this section.'); }; reader.readAsDataURL(file); });
 byId('analytics-period').addEventListener('change', renderAnalytics);
 byId('certificate-date').addEventListener('change', showSelectedCertificateDate);
+setCertificateActionsState(false);
+byId('certificate-name').addEventListener('input', () => { generatedCertificate = null; setCertificateActionsState(false); });
+byId('certificate-date').addEventListener('input', () => { generatedCertificate = null; setCertificateActionsState(false); });
 byId('bulk-offer-letter-upload').addEventListener('change', (event) => { uploadFiles(event.target.files, 'offerLetters').finally(() => { event.target.value = ''; }); });
 byId('bulk-video-testimony-upload').addEventListener('change', (event) => { uploadFiles(event.target.files, 'videoTestimonies').finally(() => { event.target.value = ''; }); });
 document.addEventListener('click', (event) => { const panelLink = event.target.closest('.menu-link'); if (panelLink) return showPanel(panelLink.dataset.panelTarget); const modeButton = event.target.closest('[data-certificate-mode]'); if (modeButton) return setCertificateMode(modeButton.dataset.certificateMode); if (event.target.closest('#refresh-analytics')) return loadAnalytics(); if (event.target.closest('#generate-certificate')) return generateCertificate(); if (event.target.closest('#download-certificate')) return downloadGeneratedCertificate(); if (event.target.closest('#share-certificate-file')) return shareGeneratedCertificate(); if (event.target.closest('#share-certificate-whatsapp')) return shareCertificateOnWhatsApp(); if (event.target.closest('#generate-bulk-certificates')) return generateBulkCertificates(); const saveButton = event.target.closest('[data-save-section]'); if (saveButton) return saveSection(saveButton.dataset.saveSection); const article = event.target.closest('article'); if (event.target.classList.contains('remove') && article) { content[article.dataset.type].splice(article.dataset.index, 1); render(); } });
