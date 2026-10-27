@@ -218,21 +218,28 @@ if (heroMomentumCard) {
   heroMomentumCard.innerHTML = '<span class="round-progress">LAB</span><div><b>Real case labs</b><small>Follow the money trail</small></div>';
 }
 
-const welcomePopupKey = 'rv-welcome-popup-dismissed';
+// Switch this to "standard" after the Diwali campaign. The original popup is
+// intentionally kept here so it can be restored without rebuilding it.
+const welcomePopupMode = 'diwali'; // 'diwali' | 'standard'
+const welcomePopupKey = `rv-welcome-popup-dismissed-${welcomePopupMode}`;
+const diwaliWhatsAppMessage = encodeURIComponent('Hi RV Consulting, I am interested in the Diwali offer for the AML / KYC / Fraud Investigation / Crypto course. Please share enrolment details.');
 const showWelcomePopup = () => {
   if (sessionStorage.getItem(welcomePopupKey)) return;
   const popup = document.createElement('div');
-  popup.className = 'welcome-popup';
+  popup.className = `welcome-popup ${welcomePopupMode === 'diwali' ? 'diwali-popup' : ''}`;
   popup.id = 'welcome-popup';
   popup.setAttribute('role', 'dialog');
   popup.setAttribute('aria-modal', 'true');
-  popup.setAttribute('aria-label', 'Upcoming batch enrolment');
-  popup.innerHTML = `<div class="welcome-popup-card"><div class="welcome-popup-top">LIMITED SEATS FOR THE UPCOMING BATCH</div><button class="welcome-popup-close" type="button" aria-label="Close enrolment notice">×</button><div class="welcome-popup-content"><h2>Only a few seats<br>left to <em>enrol.</em></h2><p>Join RV Consulting's latest upcoming batch for practical AML, KYC, fraud and crypto investigation training.</p><p class="welcome-goal">Make a focused choice today and achieve your career goals with better guidance.</p><div class="welcome-popup-actions"><a class="button" href="https://wa.me/919717766543?text=Hi%20RV%20Consulting%2C%20I%20want%20to%20enrol%20for%20the%20upcoming%20batch." target="_blank" rel="noopener">Enrol on WhatsApp <span>→</span></a><a class="button welcome-call" href="tel:+919717766543">Call us <span>→</span></a></div><a class="welcome-explore" href="#enrolment">Explore programme details →</a></div></div>`;
+  popup.setAttribute('aria-label', welcomePopupMode === 'diwali' ? 'Diwali special offer' : 'Upcoming batch enrolment');
+  popup.innerHTML = welcomePopupMode === 'diwali'
+    ? `<div class="diwali-sparkles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i></div><div class="welcome-popup-card"><div class="diwali-lights" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="welcome-popup-top">🪔 SPECIAL DIWALI OFFER — LIMITED SEATS</div><button class="welcome-popup-close" type="button" aria-label="Close Diwali offer">×</button><div class="welcome-popup-content"><p class="diwali-greeting">Celebrate your career spark with RV Consulting</p><h2>Lowest fee.<br><em>Biggest Diwali saving.</em></h2><div class="diwali-batch">NEW BATCH STARTING <strong>31<sup>st</sup> OCTOBER (SATURDAY)</strong></div><p class="diwali-course">AML / KYC / Fraud Investigation / Crypto Course</p><div class="diwali-price"><span>Fee <s>₹60,000</s></span><strong>₹30,000</strong><small>After Diwali discount · for this batch only</small></div><div class="diwali-highlights"><span>✓ Easy EMI options</span><span>✓ 100% job placements after 85% completion</span><span>✓ 4-month programme</span></div><p class="diwali-seats">Only <b>08 seats</b> available for the new batch</p><div class="welcome-popup-actions"><a class="button" href="https://wa.me/919717766543?text=${diwaliWhatsAppMessage}" target="_blank" rel="noopener">Claim Diwali offer <span>→</span></a><a class="button welcome-call" href="tel:+919717766543">Call us <span>→</span></a></div><a class="welcome-explore" href="#enrolment">View programme details →</a></div><div class="diwali-diyas" aria-hidden="true"><span>🪔</span><span>🪔</span><span>🪔</span></div></div>`
+    : `<div class="welcome-popup-card"><div class="welcome-popup-top">LIMITED SEATS FOR THE UPCOMING BATCH</div><button class="welcome-popup-close" type="button" aria-label="Close enrolment notice">×</button><div class="welcome-popup-content"><h2>Only a few seats<br>left to <em>enrol.</em></h2><p>Join RV Consulting's latest upcoming batch for practical AML, KYC, fraud and crypto investigation training.</p><p class="welcome-goal">Make a focused choice today and achieve your career goals with better guidance.</p><div class="welcome-popup-actions"><a class="button" href="https://wa.me/919717766543?text=Hi%20RV%20Consulting%2C%20I%20want%20to%20enrol%20for%20the%20upcoming%20batch." target="_blank" rel="noopener">Enrol on WhatsApp <span>→</span></a><a class="button welcome-call" href="tel:+919717766543">Call us <span>→</span></a></div><a class="welcome-explore" href="#enrolment">Explore programme details →</a></div></div>`;
   document.body.append(popup);
   const dismiss = () => { sessionStorage.setItem(welcomePopupKey, 'true'); popup.remove(); };
   popup.querySelector('.welcome-popup-close').addEventListener('click', dismiss);
   popup.querySelector('.welcome-explore').addEventListener('click', dismiss);
   popup.addEventListener('click', (event) => { if (event.target === popup) dismiss(); });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && document.querySelector('#welcome-popup')) dismiss(); }, { once: true });
   popup.querySelector('.welcome-popup-close').focus();
 };
 window.setTimeout(showWelcomePopup, 450);
