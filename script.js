@@ -218,9 +218,7 @@ if (heroMomentumCard) {
   heroMomentumCard.innerHTML = '<span class="round-progress">LAB</span><div><b>Real case labs</b><small>Follow the money trail</small></div>';
 }
 
-// Switch this to "standard" after the Diwali campaign. The original popup is
-// intentionally kept here so it can be restored without rebuilding it.
-const welcomePopupMode = 'diwali'; // 'diwali' | 'standard'
+const welcomePopupMode = 'standard'; // 'diwali' | 'standard'
 const diwaliWhatsAppMessage = encodeURIComponent('Hi RV Consulting, I am interested in the Diwali offer for the AML / KYC / Fraud Investigation / Crypto course. Please share enrolment details.');
 const showWelcomePopup = () => {
   if (document.querySelector('#welcome-popup')) return;
@@ -242,7 +240,6 @@ const showWelcomePopup = () => {
   popup.querySelector('.welcome-popup-close').focus();
 };
 window.setTimeout(showWelcomePopup, 450);
-document.querySelector('#diwali-sticky-offer')?.addEventListener('click', showWelcomePopup);
 window.addEventListener('hashchange', () => {
   if (location.hash === '#top' || location.hash === '') window.setTimeout(showWelcomePopup, 180);
 });
